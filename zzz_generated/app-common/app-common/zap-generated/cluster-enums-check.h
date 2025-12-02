@@ -91,6 +91,10 @@
 #include <clusters/LevelControl/EnumsCheck.h>
 #include <clusters/LocalizationConfiguration/EnumsCheck.h>
 #include <clusters/LowPower/EnumsCheck.h>
+#include <clusters/LowpanBleSensor/EnumsCheck.h>
+#include <clusters/LowpanGroup/EnumsCheck.h>
+#include <clusters/LowpanLocation/EnumsCheck.h>
+#include <clusters/LowpanWebServer/EnumsCheck.h>
 #include <clusters/MediaInput/EnumsCheck.h>
 #include <clusters/MediaPlayback/EnumsCheck.h>
 #include <clusters/Messages/EnumsCheck.h>

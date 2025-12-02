@@ -489,6 +489,31 @@ constexpr DataModel::DeviceTypeEntry kAllClustersAppServerExample = {
     .deviceTypeRevision = kAllClustersAppServerExampleDeviceTypeRevision,
 };
 
+constexpr DataModel::DeviceTypeEntry kLowpanMain = {
+    .deviceTypeId       = kLowpanMainDeviceTypeId,
+    .deviceTypeRevision = kLowpanMainDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kLowpanSmartswitch = {
+    .deviceTypeId       = kLowpanSmartswitchDeviceTypeId,
+    .deviceTypeRevision = kLowpanSmartswitchDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kLowpanRocker = {
+    .deviceTypeId       = kLowpanRockerDeviceTypeId,
+    .deviceTypeRevision = kLowpanRockerDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kLowpanKeypad = {
+    .deviceTypeId       = kLowpanKeypadDeviceTypeId,
+    .deviceTypeRevision = kLowpanKeypadDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kLowpanProxy = {
+    .deviceTypeId       = kLowpanProxyDeviceTypeId,
+    .deviceTypeRevision = kLowpanProxyDeviceTypeRevision,
+};
+
 } // namespace Type
 } // namespace Device
 } // namespace app

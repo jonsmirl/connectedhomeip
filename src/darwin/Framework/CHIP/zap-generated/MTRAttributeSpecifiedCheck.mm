@@ -7001,6 +7001,124 @@ static BOOL AttributeIsSpecifiedInSampleMEICluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL AttributeIsSpecifiedInLowpanGroupCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::LowpanGroup;
+    switch (aAttributeId) {
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known LowpanGroup attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInLowpanLocationCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::LowpanLocation;
+    switch (aAttributeId) {
+    case Attributes::Latitude::Id: {
+        return YES;
+    }
+    case Attributes::Longitude::Id: {
+        return YES;
+    }
+    case Attributes::Timezone::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known LowpanLocation attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInLowpanBLESensorCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::LowpanBleSensor;
+    switch (aAttributeId) {
+    case Attributes::Sensors::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known LowpanBLESensor attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInLowpanWebServerCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::LowpanWebServer;
+    switch (aAttributeId) {
+    case Attributes::Enable::Id: {
+        return YES;
+    }
+    case Attributes::Hostname::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known LowpanWebServer attribute.
+        return NO;
+    }
+    }
+}
 
 BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
 {
@@ -7418,6 +7536,18 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::SampleMei::Id: {
         return AttributeIsSpecifiedInSampleMEICluster(aAttributeId);
+    }
+    case Clusters::LowpanGroup::Id: {
+        return AttributeIsSpecifiedInLowpanGroupCluster(aAttributeId);
+    }
+    case Clusters::LowpanLocation::Id: {
+        return AttributeIsSpecifiedInLowpanLocationCluster(aAttributeId);
+    }
+    case Clusters::LowpanBleSensor::Id: {
+        return AttributeIsSpecifiedInLowpanBLESensorCluster(aAttributeId);
+    }
+    case Clusters::LowpanWebServer::Id: {
+        return AttributeIsSpecifiedInLowpanWebServerCluster(aAttributeId);
     }
     default: {
         return NO;

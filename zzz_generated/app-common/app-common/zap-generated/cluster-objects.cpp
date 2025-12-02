@@ -299,6 +299,22 @@
 #include <clusters/LowPower/Commands.ipp>
 #include <clusters/LowPower/Events.ipp>
 #include <clusters/LowPower/Structs.ipp>
+#include <clusters/LowpanBleSensor/Attributes.ipp>
+#include <clusters/LowpanBleSensor/Commands.ipp>
+#include <clusters/LowpanBleSensor/Events.ipp>
+#include <clusters/LowpanBleSensor/Structs.ipp>
+#include <clusters/LowpanGroup/Attributes.ipp>
+#include <clusters/LowpanGroup/Commands.ipp>
+#include <clusters/LowpanGroup/Events.ipp>
+#include <clusters/LowpanGroup/Structs.ipp>
+#include <clusters/LowpanLocation/Attributes.ipp>
+#include <clusters/LowpanLocation/Commands.ipp>
+#include <clusters/LowpanLocation/Events.ipp>
+#include <clusters/LowpanLocation/Structs.ipp>
+#include <clusters/LowpanWebServer/Attributes.ipp>
+#include <clusters/LowpanWebServer/Commands.ipp>
+#include <clusters/LowpanWebServer/Events.ipp>
+#include <clusters/LowpanWebServer/Structs.ipp>
 #include <clusters/MediaInput/Attributes.ipp>
 #include <clusters/MediaInput/Commands.ipp>
 #include <clusters/MediaInput/Events.ipp>
@@ -1494,6 +1510,20 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::SampleMei::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::LowpanGroup::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::LowpanBleSensor::Id: {
         switch (aCommand)
         {
         default:

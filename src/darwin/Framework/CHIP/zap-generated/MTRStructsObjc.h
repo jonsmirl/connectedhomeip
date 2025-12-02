@@ -3005,4 +3005,12 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
 @end
 
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRLowpanBLESensorClusterSensorStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSString * _Nonnull macAddress MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy, getter=getCount) NSNumber * _Nonnull count MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull rssi MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull bridged MTR_PROVISIONALLY_AVAILABLE;
+@end
+
 NS_ASSUME_NONNULL_END

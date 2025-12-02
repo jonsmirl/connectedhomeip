@@ -5193,6 +5193,14 @@ public class ClusterWriteMapping {
       writeSampleMeiFlipFlopCommandParams
     );
     writeSampleMeiInteractionInfo.put("writeFlipFlopAttribute", writeSampleMeiFlipFlopAttributeInteractionInfo);
-    writeAttributeMap.put("sampleMei", writeSampleMeiInteractionInfo);return writeAttributeMap;
+    writeAttributeMap.put("sampleMei", writeSampleMeiInteractionInfo);
+    Map<String, InteractionInfo> writeLowpanGroupInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("lowpanGroup", writeLowpanGroupInteractionInfo);
+    Map<String, InteractionInfo> writeLowpanLocationInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("lowpanLocation", writeLowpanLocationInteractionInfo);
+    Map<String, InteractionInfo> writeLowpanBleSensorInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("lowpanBleSensor", writeLowpanBleSensorInteractionInfo);
+    Map<String, InteractionInfo> writeLowpanWebServerInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("lowpanWebServer", writeLowpanWebServerInteractionInfo);return writeAttributeMap;
   }
 }

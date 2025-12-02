@@ -10019,6 +10019,46 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::LowpanGroup::Id: {
+        using namespace app::Clusters::LowpanGroup;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::LowpanLocation::Id: {
+        using namespace app::Clusters::LowpanLocation;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::LowpanBleSensor::Id: {
+        using namespace app::Clusters::LowpanBleSensor;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::LowpanWebServer::Id: {
+        using namespace app::Clusters::LowpanWebServer;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     default:
         *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
         break;

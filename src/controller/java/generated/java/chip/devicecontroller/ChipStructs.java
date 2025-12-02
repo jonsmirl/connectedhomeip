@@ -21135,4 +21135,95 @@ public static class UnitTestingClusterTestGlobalStruct {
     return output.toString();
   }
 }
+public static class LowpanBleSensorClusterSensorStruct {
+  public String macAddress;
+  public Long count;
+  public Integer rssi;
+  public Boolean bridged;
+  private static final long MAC_ADDRESS_ID = 1L;
+  private static final long COUNT_ID = 2L;
+  private static final long RSSI_ID = 3L;
+  private static final long BRIDGED_ID = 4L;
+
+  public LowpanBleSensorClusterSensorStruct(
+    String macAddress,
+    Long count,
+    Integer rssi,
+    Boolean bridged
+  ) {
+    this.macAddress = macAddress;
+    this.count = count;
+    this.rssi = rssi;
+    this.bridged = bridged;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MAC_ADDRESS_ID, new StringType(macAddress)));
+    values.add(new StructElement(COUNT_ID, new UIntType(count)));
+    values.add(new StructElement(RSSI_ID, new UIntType(rssi)));
+    values.add(new StructElement(BRIDGED_ID, new BooleanType(bridged)));
+
+    return new StructType(values);
+  }
+
+  public static LowpanBleSensorClusterSensorStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String macAddress = null;
+    Long count = null;
+    Integer rssi = null;
+    Boolean bridged = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MAC_ADDRESS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          macAddress = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == COUNT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          count = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == RSSI_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          rssi = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == BRIDGED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          bridged = castingValue.value(Boolean.class);
+        }
+      }
+    }
+    return new LowpanBleSensorClusterSensorStruct(
+      macAddress,
+      count,
+      rssi,
+      bridged
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("LowpanBleSensorClusterSensorStruct {\n");
+    output.append("\tmacAddress: ");
+    output.append(macAddress);
+    output.append("\n");
+    output.append("\tcount: ");
+    output.append(count);
+    output.append("\n");
+    output.append("\trssi: ");
+    output.append(rssi);
+    output.append("\n");
+    output.append("\tbridged: ");
+    output.append(bridged);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 }

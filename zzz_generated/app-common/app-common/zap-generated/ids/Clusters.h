@@ -89,6 +89,10 @@
 #include <clusters/LevelControl/ClusterId.h>
 #include <clusters/LocalizationConfiguration/ClusterId.h>
 #include <clusters/LowPower/ClusterId.h>
+#include <clusters/LowpanBleSensor/ClusterId.h>
+#include <clusters/LowpanGroup/ClusterId.h>
+#include <clusters/LowpanLocation/ClusterId.h>
+#include <clusters/LowpanWebServer/ClusterId.h>
 #include <clusters/MediaInput/ClusterId.h>
 #include <clusters/MediaPlayback/ClusterId.h>
 #include <clusters/Messages/ClusterId.h>

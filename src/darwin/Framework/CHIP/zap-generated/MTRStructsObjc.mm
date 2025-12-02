@@ -12489,4 +12489,40 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRLowpanBLESensorClusterSensorStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _macAddress = @"";
+
+        _count = @(0);
+
+        _rssi = @(0);
+
+        _bridged = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRLowpanBLESensorClusterSensorStruct alloc] init];
+
+    other.macAddress = self.macAddress;
+    other.count = self.count;
+    other.rssi = self.rssi;
+    other.bridged = self.bridged;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: macAddress:%@; count:%@; rssi:%@; bridged:%@; >", NSStringFromClass([self class]), _macAddress, _count, _rssi, _bridged];
+    return descriptionString;
+}
+
+@end
+
 NS_ASSUME_NONNULL_END

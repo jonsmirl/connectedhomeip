@@ -1376,6 +1376,42 @@ static BOOL CommandNeedsTimedInvokeInSampleMEICluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInLowpanGroupCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::LowpanGroup;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInLowpanLocationCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::LowpanLocation;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInLowpanBLESensorCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::LowpanBleSensor;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInLowpanWebServerCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::LowpanWebServer;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 
 BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonnull aCommandID)
 {
@@ -1796,6 +1832,18 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::SampleMei::Id: {
         return CommandNeedsTimedInvokeInSampleMEICluster(commandID);
+    }
+    case Clusters::LowpanGroup::Id: {
+        return CommandNeedsTimedInvokeInLowpanGroupCluster(commandID);
+    }
+    case Clusters::LowpanLocation::Id: {
+        return CommandNeedsTimedInvokeInLowpanLocationCluster(commandID);
+    }
+    case Clusters::LowpanBleSensor::Id: {
+        return CommandNeedsTimedInvokeInLowpanBLESensorCluster(commandID);
+    }
+    case Clusters::LowpanWebServer::Id: {
+        return CommandNeedsTimedInvokeInLowpanWebServerCluster(commandID);
     }
     default: {
         return NO;

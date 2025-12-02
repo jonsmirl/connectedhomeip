@@ -9705,3 +9705,46 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::UnitTesting::Structs::
     ComplexArgumentParser::Finalize(request.member1);
     ComplexArgumentParser::Finalize(request.member2);
 }
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::LowpanBleSensor::Structs::SensorStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("SensorStruct.macAddress", "macAddress", value.isMember("macAddress")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SensorStruct.count", "count", value.isMember("count")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SensorStruct.rssi", "rssi", value.isMember("rssi")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SensorStruct.bridged", "bridged", value.isMember("bridged")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "macAddress");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.macAddress, value["macAddress"]));
+    valueCopy.removeMember("macAddress");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "count");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.count, value["count"]));
+    valueCopy.removeMember("count");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "rssi");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.rssi, value["rssi"]));
+    valueCopy.removeMember("rssi");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "bridged");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.bridged, value["bridged"]));
+    valueCopy.removeMember("bridged");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::LowpanBleSensor::Structs::SensorStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.macAddress);
+    ComplexArgumentParser::Finalize(request.count);
+    ComplexArgumentParser::Finalize(request.rssi);
+    ComplexArgumentParser::Finalize(request.bridged);
+}

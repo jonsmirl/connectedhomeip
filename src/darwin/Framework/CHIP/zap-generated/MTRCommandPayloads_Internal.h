@@ -3173,6 +3173,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRLowpanGroupClusterAddGroupEpParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRLowpanGroupClusterRemoveGroupEpParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRLowpanGroupClusterConfigurationParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRLowpanBLESensorClusterAddSensorEpParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRLowpanBLESensorClusterRemoveSensorEpParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 // Make sure that MTRBasicClusterMfgSpecificPingParams has _encodeAsDataValue just so it compiles.
 @interface MTRBasicClusterMfgSpecificPingParams (InternalMethods)
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

@@ -114,10 +114,15 @@ static /* constexpr */ const MTRDeviceTypeData knownDeviceTypes[] = {
     { 0x00000514, MTRDeviceTypeClass::Simple, @"Electrical Meter" },
     { 0x00000840, MTRDeviceTypeClass::Simple, @"Control Bridge" },
     { 0x00000850, MTRDeviceTypeClass::Simple, @"On/Off Sensor" },
+    { 0xFFF28004, MTRDeviceTypeClass::Simple, @"Lowpan Smartswitch" },
 };
 
 static_assert(ExtractVendorFromMEI(0xFFF10001) != 0, "Must have class defined for \"Orphan Clusters\" if it's a standard device type");
 static_assert(ExtractVendorFromMEI(0xFFF10003) != 0, "Must have class defined for \"All-clusters-app Server Example\" if it's a standard device type");
+static_assert(ExtractVendorFromMEI(0xFFF28001) != 0, "Must have class defined for \"Lowpan Main\" if it's a standard device type");
+static_assert(ExtractVendorFromMEI(0xFFF28005) != 0, "Must have class defined for \"Lowpan Rocker\" if it's a standard device type");
+static_assert(ExtractVendorFromMEI(0xFFF28006) != 0, "Must have class defined for \"Lowpan Keypad\" if it's a standard device type");
+static_assert(ExtractVendorFromMEI(0xFFF28007) != 0, "Must have class defined for \"Lowpan Proxy\" if it's a standard device type");
 
 } // anonymous namespace
 

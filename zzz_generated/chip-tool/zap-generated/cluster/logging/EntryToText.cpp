@@ -309,6 +309,14 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "FaultInjection";
     case chip::app::Clusters::SampleMei::Id:
         return "SampleMei";
+    case chip::app::Clusters::LowpanGroup::Id:
+        return "LowpanGroup";
+    case chip::app::Clusters::LowpanLocation::Id:
+        return "LowpanLocation";
+    case chip::app::Clusters::LowpanBleSensor::Id:
+        return "LowpanBleSensor";
+    case chip::app::Clusters::LowpanWebServer::Id:
+        return "LowpanWebServer";
     default:
         return "Unknown";
     }
@@ -5084,6 +5092,86 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::LowpanGroup::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::LowpanGroup::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::LowpanGroup::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::LowpanGroup::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::LowpanGroup::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::LowpanGroup::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::LowpanLocation::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::LowpanLocation::Attributes::Latitude::Id:
+            return "Latitude";
+        case chip::app::Clusters::LowpanLocation::Attributes::Longitude::Id:
+            return "Longitude";
+        case chip::app::Clusters::LowpanLocation::Attributes::Timezone::Id:
+            return "Timezone";
+        case chip::app::Clusters::LowpanLocation::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::LowpanLocation::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::LowpanLocation::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::LowpanLocation::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::LowpanLocation::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::LowpanBleSensor::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::LowpanBleSensor::Attributes::Sensors::Id:
+            return "Sensors";
+        case chip::app::Clusters::LowpanBleSensor::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::LowpanBleSensor::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::LowpanBleSensor::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::LowpanBleSensor::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::LowpanBleSensor::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::LowpanWebServer::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::LowpanWebServer::Attributes::Enable::Id:
+            return "Enable";
+        case chip::app::Clusters::LowpanWebServer::Attributes::Hostname::Id:
+            return "Hostname";
+        case chip::app::Clusters::LowpanWebServer::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::LowpanWebServer::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::LowpanWebServer::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::LowpanWebServer::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::LowpanWebServer::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     default:
         return "Unknown";
     }
@@ -6525,6 +6613,30 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::LowpanGroup::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::LowpanGroup::Commands::AddGroupEp::Id:
+            return "AddGroupEp";
+        case chip::app::Clusters::LowpanGroup::Commands::RemoveGroupEp::Id:
+            return "RemoveGroupEp";
+        case chip::app::Clusters::LowpanGroup::Commands::Configuration::Id:
+            return "Configuration";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::LowpanBleSensor::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::LowpanBleSensor::Commands::AddSensorEp::Id:
+            return "AddSensorEp";
+        case chip::app::Clusters::LowpanBleSensor::Commands::RemoveSensorEp::Id:
+            return "RemoveSensorEp";
+        default:
+            return "Unknown";
+        }
+    }
     default:
         return "Unknown";
     }
@@ -7328,6 +7440,16 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Orphan Clusters";
     case 0xFFF10003:
         return "All-clusters-app Server Example";
+    case 0xFFF28001:
+        return "Lowpan Main";
+    case 0xFFF28004:
+        return "Lowpan Smartswitch";
+    case 0xFFF28005:
+        return "Lowpan Rocker";
+    case 0xFFF28006:
+        return "Lowpan Keypad";
+    case 0xFFF28007:
+        return "Lowpan Proxy";
     default:
         return "Unknown";
     }

@@ -22965,6 +22965,158 @@ static id _Nullable DecodeAttributeValueForSampleMEICluster(AttributeId aAttribu
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForLowpanGroupCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::LowpanGroup;
+    switch (aAttributeId) {
+    default: {
+        // Not a known LowpanGroup attribute.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeAttributeValueForLowpanLocationCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::LowpanLocation;
+    switch (aAttributeId) {
+    case Attributes::Latitude::Id: {
+        using TypeInfo = Attributes::Latitude::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithInt:cppValue];
+        return value;
+    }
+    case Attributes::Longitude::Id: {
+        using TypeInfo = Attributes::Longitude::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithInt:cppValue];
+        return value;
+    }
+    case Attributes::Timezone::Id: {
+        using TypeInfo = Attributes::Timezone::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSString * _Nonnull value;
+        value = AsString(cppValue);
+        if (value == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
+        }
+        return value;
+    }
+    default: {
+        // Not a known LowpanLocation attribute.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeAttributeValueForLowpanBLESensorCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::LowpanBleSensor;
+    switch (aAttributeId) {
+    case Attributes::Sensors::Id: {
+        using TypeInfo = Attributes::Sensors::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRLowpanBLESensorClusterSensorStruct * newElement_0;
+                newElement_0 = [MTRLowpanBLESensorClusterSensorStruct new];
+                newElement_0.macAddress = AsString(entry_0.macAddress);
+                if (newElement_0.macAddress == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+                newElement_0.count = [NSNumber numberWithUnsignedInt:entry_0.count];
+                newElement_0.rssi = [NSNumber numberWithUnsignedShort:entry_0.rssi];
+                newElement_0.bridged = [NSNumber numberWithBool:entry_0.bridged];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    default: {
+        // Not a known LowpanBLESensor attribute.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeAttributeValueForLowpanWebServerCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::LowpanWebServer;
+    switch (aAttributeId) {
+    case Attributes::Enable::Id: {
+        using TypeInfo = Attributes::Enable::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::Hostname::Id: {
+        using TypeInfo = Attributes::Hostname::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSString * _Nonnull value;
+        value = AsString(cppValue);
+        if (value == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
+        }
+        return value;
+    }
+    default: {
+        // Not a known LowpanWebServer attribute.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 
 id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
@@ -23386,6 +23538,18 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::SampleMei::Id: {
         return DecodeAttributeValueForSampleMEICluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::LowpanGroup::Id: {
+        return DecodeAttributeValueForLowpanGroupCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::LowpanLocation::Id: {
+        return DecodeAttributeValueForLowpanLocationCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::LowpanBleSensor::Id: {
+        return DecodeAttributeValueForLowpanBLESensorCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::LowpanWebServer::Id: {
+        return DecodeAttributeValueForLowpanWebServerCluster(aPath.mAttributeId, aReader, aError);
     }
     default: {
         break;

@@ -148,6 +148,14 @@
 #include <clusters/LocalizationConfiguration/MetadataProvider.h>
 #include <clusters/LowPower/Ids.h>
 #include <clusters/LowPower/MetadataProvider.h>
+#include <clusters/LowpanBleSensor/Ids.h>
+#include <clusters/LowpanBleSensor/MetadataProvider.h>
+#include <clusters/LowpanGroup/Ids.h>
+#include <clusters/LowpanGroup/MetadataProvider.h>
+#include <clusters/LowpanLocation/Ids.h>
+#include <clusters/LowpanLocation/MetadataProvider.h>
+#include <clusters/LowpanWebServer/Ids.h>
+#include <clusters/LowpanWebServer/MetadataProvider.h>
 #include <clusters/MediaInput/Ids.h>
 #include <clusters/MediaInput/MetadataProvider.h>
 #include <clusters/MediaPlayback/Ids.h>
@@ -652,6 +660,26 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == LocalizationConfiguration::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LocalizationConfiguration::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == LowpanBleSensor::Id) || ...))
+    {
+        if (id == LowpanBleSensor::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LowpanBleSensor::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == LowpanGroup::Id) || ...))
+    {
+        if (id == LowpanGroup::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LowpanGroup::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == LowpanLocation::Id) || ...))
+    {
+        if (id == LowpanLocation::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LowpanLocation::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == LowpanWebServer::Id) || ...))
+    {
+        if (id == LowpanWebServer::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LowpanWebServer::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == LowPower::Id) || ...))
     {

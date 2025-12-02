@@ -5623,6 +5623,58 @@ static id _Nullable DecodeEventPayloadForSampleMEICluster(EventId aEventId, TLV:
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForLowpanGroupCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::LowpanGroup;
+    switch (aEventId) {
+    default: {
+        // Not a known LowpanGroup event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForLowpanLocationCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::LowpanLocation;
+    switch (aEventId) {
+    default: {
+        // Not a known LowpanLocation event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForLowpanBLESensorCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::LowpanBleSensor;
+    switch (aEventId) {
+    default: {
+        // Not a known LowpanBLESensor event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForLowpanWebServerCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::LowpanWebServer;
+    switch (aEventId) {
+    default: {
+        // Not a known LowpanWebServer event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 
 id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
@@ -6040,6 +6092,18 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::SampleMei::Id: {
         return DecodeEventPayloadForSampleMEICluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::LowpanGroup::Id: {
+        return DecodeEventPayloadForLowpanGroupCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::LowpanLocation::Id: {
+        return DecodeEventPayloadForLowpanLocationCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::LowpanBleSensor::Id: {
+        return DecodeEventPayloadForLowpanBLESensorCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::LowpanWebServer::Id: {
+        return DecodeEventPayloadForLowpanWebServerCluster(aPath.mEventId, aReader, aError);
     }
     default: {
         break;

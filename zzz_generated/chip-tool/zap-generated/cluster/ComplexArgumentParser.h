@@ -1092,3 +1092,8 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::UnitTesting::St
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::UnitTesting::Structs::TestListStructOctet::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::LowpanBleSensor::Structs::SensorStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::LowpanBleSensor::Structs::SensorStruct::Type & request);

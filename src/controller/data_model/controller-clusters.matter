@@ -12207,3 +12207,94 @@ cluster SampleMei = 4294048800 {
   command AddArguments(AddArgumentsRequest): AddArgumentsResponse = 2;
 }
 
+/** The Lowpan Group cluster provides facilities to manage group endpoints including
+      adding and removing group endpoints with associated names. */
+cluster LowpanGroup = 4294114305 {
+  revision 1;
+
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AddGroupEpRequest {
+    int16u endpoint = 0;
+    char_string groupName = 1;
+  }
+
+  request struct RemoveGroupEpRequest {
+    int16u endpoint = 0;
+  }
+
+  /** Command to add a new group endpoint with the specified endpoint ID and group name. */
+  command AddGroupEp(AddGroupEpRequest): DefaultSuccess = 0;
+  /** Command to remove an existing group endpoint by its endpoint ID. */
+  command RemoveGroupEp(RemoveGroupEpRequest): DefaultSuccess = 1;
+  /** Configuration command for group management settings. */
+  command Configuration(): DefaultSuccess = 2;
+}
+
+/** The Location cluster provides facilities to configure and retrieve geographical
+      location information including latitude, longitude, and timezone settings. */
+cluster LowpanLocation = 4294114306 {
+  revision 1;
+
+  readonly attribute int32s latitude = 0;
+  readonly attribute int32s longitude = 1;
+  readonly attribute char_string<100> timezone = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** The BLE Sensor cluster provides facilities to manage BLE sensor devices including
+      discovery, bridging, and monitoring of sensor data from BLE devices. */
+cluster LowpanBleSensor = 4294114307 {
+  revision 1;
+
+  struct SensorStruct {
+    char_string macAddress = 1;
+    int32u count = 2;
+    int16u rssi = 3;
+    boolean bridged = 4;
+  }
+
+  readonly attribute SensorStruct sensors[] = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AddSensorEpRequest {
+    char_string macAddress = 0;
+  }
+
+  request struct RemoveSensorEpRequest {
+    int64u endpoint = 0;
+  }
+
+  /** Command to add a new BLE sensor endpoint by specifying its MAC address. */
+  command AddSensorEp(AddSensorEpRequest): DefaultSuccess = 0;
+  /** Command to remove an existing BLE sensor endpoint by its endpoint ID. */
+  command RemoveSensorEp(RemoveSensorEpRequest): DefaultSuccess = 1;
+}
+
+/** The Web Server cluster provides facilities to configure and control an embedded web
+      server including enable/disable functionality and hostname configuration with automatic mDNS
+      registration. */
+cluster LowpanWebServer = 4294114308 {
+  revision 1;
+
+  readonly attribute boolean enable = 0;
+  readonly attribute char_string<32> hostname = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+

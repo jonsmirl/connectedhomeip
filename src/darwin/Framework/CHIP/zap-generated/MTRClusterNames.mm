@@ -441,6 +441,18 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeSampleMEIID:
         result = @"SampleMEI";
         break;
+    case MTRClusterIDTypeLowpanGroupID:
+        result = @"LowpanGroup";
+        break;
+    case MTRClusterIDTypeLowpanLocationID:
+        result = @"LowpanLocation";
+        break;
+    case MTRClusterIDTypeLowpanBLESensorID:
+        result = @"LowpanBLESensor";
+        break;
+    case MTRClusterIDTypeLowpanWebServerID:
+        result = @"LowpanWebServer";
+        break;
 
     default:
         result = [NSString stringWithFormat:@"<Unknown clusterID %u>", clusterID];
@@ -9578,6 +9590,158 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeLowpanGroupID:
+
+        switch (attributeID) {
+
+            // Cluster LowpanGroup attributes
+        case MTRAttributeIDTypeClusterLowpanGroupAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanGroupAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanGroupAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanGroupAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanGroupAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known LowpanGroup attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeLowpanLocationID:
+
+        switch (attributeID) {
+
+            // Cluster LowpanLocation attributes
+        case MTRAttributeIDTypeClusterLowpanLocationAttributeLatitudeID:
+            result = @"Latitude";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanLocationAttributeLongitudeID:
+            result = @"Longitude";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanLocationAttributeTimezoneID:
+            result = @"Timezone";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanLocationAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanLocationAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanLocationAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanLocationAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanLocationAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known LowpanLocation attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeLowpanBLESensorID:
+
+        switch (attributeID) {
+
+            // Cluster LowpanBLESensor attributes
+        case MTRAttributeIDTypeClusterLowpanBLESensorAttributeSensorsID:
+            result = @"Sensors";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanBLESensorAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanBLESensorAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanBLESensorAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanBLESensorAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanBLESensorAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known LowpanBLESensor attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeLowpanWebServerID:
+
+        switch (attributeID) {
+
+            // Cluster LowpanWebServer attributes
+        case MTRAttributeIDTypeClusterLowpanWebServerAttributeEnableID:
+            result = @"Enable";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanWebServerAttributeHostnameID:
+            result = @"Hostname";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanWebServerAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanWebServerAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanWebServerAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanWebServerAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterLowpanWebServerAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known LowpanWebServer attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     default:
         result = [NSString stringWithFormat:@"<Unknown clusterID %u>", clusterID];
         break;
@@ -12538,6 +12702,66 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeLowpanGroupID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterLowpanGroupCommandAddGroupEpID:
+            result = @"AddGroupEp";
+            break;
+
+        case MTRCommandIDTypeClusterLowpanGroupCommandRemoveGroupEpID:
+            result = @"RemoveGroupEp";
+            break;
+
+        case MTRCommandIDTypeClusterLowpanGroupCommandConfigurationID:
+            result = @"Configuration";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeLowpanLocationID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeLowpanBLESensorID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterLowpanBLESensorCommandAddSensorEpID:
+            result = @"AddSensorEp";
+            break;
+
+        case MTRCommandIDTypeClusterLowpanBLESensorCommandRemoveSensorEpID:
+            result = @"RemoveSensorEp";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeLowpanWebServerID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     default:
         result = [NSString stringWithFormat:@"<Unknown clusterID %u>", clusterID];
         break;
@@ -14385,6 +14609,46 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         case MTRCommandIDTypeClusterSampleMEICommandAddArgumentsResponseID:
             result = @"AddArgumentsResponse";
             break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeLowpanGroupID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeLowpanLocationID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeLowpanBLESensorID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeLowpanWebServerID:
+
+        switch (commandID) {
 
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
@@ -16368,6 +16632,46 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         case MTREventIDTypeClusterSampleMEIEventPingCountEventID:
             result = @"PingCountEvent";
             break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeLowpanGroupID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeLowpanLocationID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeLowpanBLESensorID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeLowpanWebServerID:
+
+        switch (eventID) {
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];

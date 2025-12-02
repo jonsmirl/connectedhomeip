@@ -302,6 +302,21 @@ constexpr uint8_t kOrphanClustersDeviceTypeRevision = 1;
 constexpr DeviceTypeId kAllClustersAppServerExampleDeviceTypeId  = 0xFFF10003;
 constexpr uint8_t kAllClustersAppServerExampleDeviceTypeRevision = 1;
 
+constexpr DeviceTypeId kLowpanMainDeviceTypeId  = 0xFFF28001;
+constexpr uint8_t kLowpanMainDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kLowpanSmartswitchDeviceTypeId  = 0xFFF28004;
+constexpr uint8_t kLowpanSmartswitchDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kLowpanRockerDeviceTypeId  = 0xFFF28005;
+constexpr uint8_t kLowpanRockerDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kLowpanKeypadDeviceTypeId  = 0xFFF28006;
+constexpr uint8_t kLowpanKeypadDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kLowpanProxyDeviceTypeId  = 0xFFF28007;
+constexpr uint8_t kLowpanProxyDeviceTypeRevision = 1;
+
 } // namespace Device
 } // namespace app
 } // namespace chip
