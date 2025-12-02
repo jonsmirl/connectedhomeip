@@ -1,0 +1,49 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+# Import args from chip
+import("${chip_root}/config/standalone/args.gni")
+
+# Enable PW RPC
+chip_enable_pw_rpc = true
+
+# Enable additional features for PW RPC
+chip_build_pw_rpc_echo_proto = true
+chip_build_pw_rpc_common_proto = true
+
+# Enable ImGui for debugging
+chip_examples_enable_imgui_ui = true
+
+# Enable operational credentials
+chip_enable_operational_credentials = true
+
+# Enable commissioner discovery
+chip_enable_commissioner_discovery = true
+
+# Enable extended discovery
+chip_enable_extended_discovery = true
+
+# Enable group messaging
+chip_enable_group_messaging = true
+
+# Enable clusters for dual endpoint functionality
+chip_enable_on_off_cluster = true
+chip_enable_level_control_cluster = true
+chip_enable_color_control_cluster = true
+chip_enable_identify_cluster = true
+chip_enable_scenes_cluster = true
+chip_enable_groups_cluster = true
+chip_enable_bindings_cluster = true

@@ -36,6 +36,8 @@ config("includes") {
 
 executable("chip-lighting-app") {
   sources = [
+    "ColorControlOverrides.cpp",
+    "LightingAppBasicInformation.cpp",
     "LightingAppCommandDelegate.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
@@ -45,6 +47,7 @@ executable("chip-lighting-app") {
     "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/examples/lighting-app/lighting-common:lighting-manager",
     "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/app/clusters/color-control-server",
     "${chip_root}/src/app/clusters/software-diagnostics-server:software-fault-listener",
     "${chip_root}/src/app/common:ids",
     "${chip_root}/src/lib",
@@ -54,7 +57,9 @@ executable("chip-lighting-app") {
   if (chip_examples_enable_imgui_ui) {
     deps += [
       "${chip_root}/examples/common/imgui_ui",
-      "${chip_root}/examples/common/imgui_ui/windows:connectivity",
+      "${chip_root}/examples/common/imgui_ui/windows:basic_information",
+      "${chip_root}/examples/common/imgui_ui/windows:color_control_debug",
+      "${chip_root}/examples/common/imgui_ui/windows:group_management",
       "${chip_root}/examples/common/imgui_ui/windows:light",
       "${chip_root}/examples/common/imgui_ui/windows:occupancy_sensing",
       "${chip_root}/examples/common/imgui_ui/windows:qrcode",
@@ -109,6 +114,9 @@ executable("chip-lighting-app") {
     # -Wconversion, remove check for RPC build only.
     cflags = [ "-Wconversion" ]
   }
+
+  # Allow multiple definitions to override Color Control server empty functions
+  ldflags = [ "-Wl,--allow-multiple-definition" ]
 
   output_dir = root_out_dir
 }

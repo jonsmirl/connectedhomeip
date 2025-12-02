@@ -32,3 +32,6 @@
 
 #define CHIP_DEVICE_CONFIG_DEVICE_TYPE 121 // 0x0079 = 121 = Matter Microwave Oven
 #define CHIP_DEVICE_CONFIG_DEVICE_NAME "Test Microwave Oven"
+
+// Enable --secured-device-port and --unsecured-commissioner-port command line options
+#define CHIP_DEVICE_ENABLE_PORT_PARAMS 1

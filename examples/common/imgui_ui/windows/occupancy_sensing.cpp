@@ -43,6 +43,12 @@ void OccupancySensing::UpdateState()
 void OccupancySensing::Render()
 {
     ImGui::Begin(mTitle.c_str());
+    RenderContent();
+    ImGui::End();
+}
+
+void OccupancySensing::RenderContent()
+{
     ImGui::Text("On Endpoint %d", mEndpointId);
 
     bool occupied = mOccupancy.Has(OccupancyBitmap::kOccupied);
@@ -55,8 +61,6 @@ void OccupancySensing::Render()
         // Occupancy is just a single bit, update it as such
         mTargetOccupancy.SetValue(uiState ? BitMask(OccupancyBitmap::kOccupied) : BitMask());
     }
-
-    ImGui::End();
 }
 
 } // namespace Windows

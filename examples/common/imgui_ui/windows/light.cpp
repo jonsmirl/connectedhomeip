@@ -187,6 +187,79 @@ void Light::Render()
     ImGui::End();
 }
 
+void Light::RenderContent()
+{
+    // Content from Render() method without Begin/End
+    ImGui::Text("Light on endpoint %d", mEndpointId);
+
+    ImGui::Indent();
+    {
+        bool uiValue = mLightIsOn;
+        ImGui::Checkbox("Light is ON", &uiValue);
+        if (uiValue != mLightIsOn)
+        {
+            mTargetLightIsOn.SetValue(uiValue); // schedule future update
+        }
+    }
+
+    // bright yellow vs dark yellow on/off view
+    ImGui::ColorButton("LightIsOn", mLightIsOn ? ImVec4(1.0f, 1.0f, 0.0f, 1.0f) : ImVec4(0.3f, 0.3f, 0.0f, 1.0f),
+                       0 /* ImGuiColorEditFlags_* */, ImVec2(80, 80));
+    ImGui::Unindent();
+
+    ImGui::Text("Level Control:");
+    ImGui::Indent();
+    ImGui::Text("Remaining Time (1/10s): %d", mLevelRemainingTime10sOfSec);
+    ImGui::Text("MIN Level:              %d", mMinLevel);
+    ImGui::Text("MAX Level:              %d", mMaxLevel);
+    if (mCurrentLevel.IsNull())
+    {
+        ImGui::Text("Current Level: NULL");
+    }
+    else
+    {
+        int uiValue = mCurrentLevel.Value();
+        ImGui::SliderInt("Current Level", &uiValue, mMinLevel, mMaxLevel);
+        if (uiValue != mCurrentLevel.Value())
+        {
+            mTargetLevel.SetValue(uiValue); // schedule future update
+        }
+    }
+    ImGui::Unindent();
+
+    ImGui::Text("Color Control:");
+    ImGui::Indent();
+    const char * mode = // based on ColorMode attribute: spec 3.2.7.9
+        (mColorMode == ColorControl::ColorModeEnum::kCurrentHueAndCurrentSaturation) ? "Hue/Saturation"
+        : (mColorMode == ColorControl::ColorModeEnum::kCurrentXAndCurrentY)          ? "X/Y"
+        : (mColorMode == ColorControl::ColorModeEnum::kColorTemperatureMireds)       ? "Temperature/Mireds"
+                                                                                     : "UNKNOWN";
+
+    ImGui::Text("Mode: %s", mode);
+
+    if (mColorMode == ColorControl::ColorModeEnum::kCurrentHueAndCurrentSaturation)
+    {
+        const float hueDegrees        = (mColorHue * 360.0f) / 254.0f;
+        const float saturationPercent = 100.0f * (mColorSaturation / 254.0f);
+
+        ImGui::Text("Current Hue:        %d (%f deg)", mColorHue, hueDegrees);
+        ImGui::Text("Current Saturation: %d (%f %%)", mColorSaturation, saturationPercent);
+
+        ImGui::ColorButton("LightColor", HueSaturationToColor(hueDegrees, saturationPercent), 0 /* ImGuiColorEditFlags_* */,
+                           ImVec2(80, 80));
+    }
+    else if (mColorMode == ColorControl::ColorModeEnum::kCurrentXAndCurrentY)
+    {
+        ImGui::Text("Current X: %d", mColorX);
+        ImGui::Text("Current Y: %d", mColorY);
+    }
+    else if (mColorMode == ColorControl::ColorModeEnum::kColorTemperatureMireds)
+    {
+        ImGui::Text("Color Temperature Mireds: %d", mColorTemperatureMireds);
+    }
+    ImGui::Unindent();
+}
+
 } // namespace Windows
 } // namespace Ui
 } // namespace example

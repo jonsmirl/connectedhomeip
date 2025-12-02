@@ -32,3 +32,6 @@
 
 #define CHIP_DEVICE_CONFIG_DEVICE_TYPE 117 // 0x0075 = 117 = Matter Dishwasher
 #define CHIP_DEVICE_CONFIG_DEVICE_NAME "Test Dishwasher"
+
+// Enable --secured-device-port and --unsecured-commissioner-port command line options
+#define CHIP_DEVICE_ENABLE_PORT_PARAMS 1

@@ -1,0 +1,327 @@
+<?xml version="1.0"?>
+<configurator>
+  <!-- Sensor data structure -->
+  <struct name="SensorStruct">
+    <cluster code="0xFFF2FC03" />
+    <item fieldId="1" name="MacAddress" type="char_string" />
+    <item fieldId="2" name="Count" type="int32u" />
+    <item fieldId="3" name="Rssi" type="int16u" />
+    <item fieldId="4" name="Bridged" type="boolean" />
+  </struct>
+
+  <cluster>
+    <domain>General</domain>
+    <name>Lowpan BLE Sensor</name>
+    <code>0xFFF2FC03</code>
+    <define>LOWPAN_BLE_SENSOR_CLUSTER</define>
+    <description>The BLE Sensor cluster provides facilities to manage BLE sensor devices including
+      discovery, bridging, and monitoring of sensor data from BLE devices.</description>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <globalAttribute code="0xFFFD" side="either" value="1" />
+
+    <!-- Attributes -->
+    <attribute side="server" code="0x0000" define="SENSORS" type="array" entryType="SensorStruct"
+      writable="false" optional="false">Sensors</attribute>
+
+    <!-- Commands -->
+    <command source="client" code="0x0000" name="AddSensorEp" optional="false">
+      <description>
+        Command to add a new BLE sensor endpoint by specifying its MAC address.
+      </description>
+      <arg name="macAddress" type="char_string" />
+    </command>
+
+    <command source="client" code="0x0001" name="RemoveSensorEp" optional="false">
+      <description>
+        Command to remove an existing BLE sensor endpoint by its endpoint ID.
+      </description>
+      <arg name="endpoint" type="int64u" />
+    </command>
+  </cluster>
+
+  <cluster>
+    <domain>General</domain>
+    <name>Lowpan Group</name>
+    <code>0xFFF2FC01</code>
+    <define>LOWPAN_GROUP_CLUSTER</define>
+    <description>The Lowpan Group cluster provides facilities to manage group endpoints including
+      adding and removing group endpoints with associated names.</description>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <globalAttribute code="0xFFFD" side="either" value="1" />
+
+    <!-- Attributes -->
+    <!-- Status attribute is commented out in the implementation
+    <attribute side="server" code="0x0000" define="STATUS" type="array"
+    optional="false">Status</attribute>
+    -->
+
+    <!-- Commands -->
+    <command source="client" code="0x0000" name="AddGroupEp" optional="false">
+      <description>
+        Command to add a new group endpoint with the specified endpoint ID and group name.
+      </description>
+      <arg name="endpoint" type="int16u" />
+      <arg name="groupName" type="char_string" />
+    </command>
+
+    <command source="client" code="0x0001" name="RemoveGroupEp" optional="false">
+      <description>
+        Command to remove an existing group endpoint by its endpoint ID.
+      </description>
+      <arg name="endpoint" type="int16u" />
+    </command>
+
+    <command source="client" code="0x0002" name="Configuration" optional="false">
+      <description>
+        Configuration command for group management settings.
+      </description>
+    </command>
+  </cluster>
+
+  <cluster>
+    <domain>General</domain>
+    <name>Lowpan Location</name>
+    <code>0xFFF2FC02</code>
+    <define>LOWPAN_LOCATION_CLUSTER</define>
+    <description>The Location cluster provides facilities to configure and retrieve geographical
+      location information including latitude, longitude, and timezone settings.</description>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <globalAttribute code="0xFFFD" side="either" value="1" />
+
+    <attribute side="server" code="0x0000" define="LATITUDE" type="int32s" writable="false"
+      default="0" optional="false">Latitude</attribute>
+    <attribute side="server" code="0x0001" define="LONGITUDE" type="int32s" writable="false"
+      default="0" optional="false">Longitude</attribute>
+    <attribute side="server" code="0x0002" define="TIMEZONE" type="char_string" length="100"
+      writable="false" default="" optional="false">Timezone</attribute>
+  </cluster>
+
+  <cluster>
+    <domain>General</domain>
+    <name>Lowpan Web Server</name>
+    <code>0xFFF2FC04</code>
+    <define>LOWPAN_WEB_SERVER_CLUSTER</define>
+    <description>The Web Server cluster provides facilities to configure and control an embedded web
+      server including enable/disable functionality and hostname configuration with automatic mDNS
+      registration.</description>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <globalAttribute code="0xFFFD" side="either" value="1" />
+
+    <!-- Attributes -->
+    <attribute side="server" code="0x0000" define="ENABLE" type="boolean" writable="false"
+      default="false" optional="false">Enable</attribute>
+    <attribute side="server" code="0x0001" define="HOSTNAME" type="char_string" length="32"
+      writable="false" default="" optional="false">Hostname</attribute>
+  </cluster>
+
+  <deviceType>
+    <name>Lowpan Main</name>
+    <domain>CHIP</domain>
+    <typeName>Lowpan Main</typeName>
+    <profileId editable="false">0x0103</profileId>
+    <deviceId editable="false">0xFFF28001</deviceId>
+    <scope>Endpoint</scope>
+    <clusters lockOthers="false">
+      <include cluster="Mode Select" client="false" server="true" clientLocked="false"
+        serverLocked="true"></include>
+      <include cluster="Lowpan BLE Sensor" client="false" server="true" clientLocked="false"
+        serverLocked="true"></include>
+      <include cluster="Lowpan Group" client="false" server="true" clientLocked="false"
+        serverLocked="true"></include>
+      <include cluster="Lowpan Location" client="false" server="true" clientLocked="false"
+        serverLocked="true"></include>
+      <include cluster="Lowpan Web Server" client="false" server="true" clientLocked="false"
+        serverLocked="true"></include>
+    </clusters>
+  </deviceType>
+
+  <deviceType>
+    <name>Lowpan Rocker</name>
+    <domain>CHIP</domain>
+    <typeName>Lowpan Rocker</typeName>
+    <profileId editable="false">0x0103</profileId>
+    <deviceId editable="false">0xFFF28005</deviceId>
+    <scope>Endpoint</scope>
+    <clusters lockOthers="false">
+    </clusters>
+  </deviceType>
+
+  <deviceType>
+    <name>Lowpan Keypad</name>
+    <domain>CHIP</domain>
+    <typeName>Lowpan Keypad</typeName>
+    <profileId editable="false">0x0103</profileId>
+    <deviceId editable="false">0xFFF28006</deviceId>
+    <scope>Endpoint</scope>
+    <clusters lockOthers="false">
+    </clusters>
+  </deviceType>
+
+  <deviceType>
+    <name>Lowpan Proxy</name>
+    <domain>CHIP</domain>
+    <typeName>Lowpan Proxy</typeName>
+    <profileId editable="false">0x0103</profileId>
+    <deviceId editable="false">0xFFF28007</deviceId>
+    <scope>Endpoint</scope>
+    <clusters lockOthers="false">
+    </clusters>
+  </deviceType>
+
+  <deviceType>
+    <name>Lowpan Smartswitch</name>
+    <domain>CHIP</domain>
+    <typeName>Lowpan Smartswitch</typeName>
+    <profileId editable="false">0x0103</profileId>
+    <deviceId editable="false">0xFFF28004</deviceId>
+    <class>Simple</class>
+    <scope>Endpoint</scope>
+    <clusters lockOthers="true">
+      <include cluster="Identify" client="false" server="true" clientLocked="true"
+        serverLocked="true">
+        <requireAttribute>IDENTIFY_TIME</requireAttribute>
+        <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+        <requireCommand>Identify</requireCommand>
+        <requireCommand>TriggerEffect</requireCommand>
+      </include>
+      <include cluster="Descriptor" client="false" server="true" clientLocked="true"
+        serverLocked="true">
+        <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+        <requireAttribute>SERVER_LIST</requireAttribute>
+        <requireAttribute>CLIENT_LIST</requireAttribute>
+        <requireAttribute>PARTS_LIST</requireAttribute>
+      </include>
+      <include cluster="Power Source" client="false" server="true" clientLocked="true"
+        serverLocked="true"></include>
+      <include cluster="Mode Select" client="false" server="true" clientLocked="false"
+        serverLocked="true"></include>
+      <include cluster="Switch" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+      <include cluster="Fixed Label" client="false" server="true" clientLocked="true"
+        serverLocked="false"></include>
+      <include cluster="User Label" client="false" server="true" clientLocked="true"
+        serverLocked="false"></include>
+      <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+        <requireCommand>AddGroup</requireCommand>
+        <requireCommand>AddGroupResponse</requireCommand>
+        <requireCommand>ViewGroup</requireCommand>
+        <requireCommand>ViewGroupResponse</requireCommand>
+        <requireCommand>GetGroupMembership</requireCommand>
+        <requireCommand>GetGroupMembershipResponse</requireCommand>
+        <requireCommand>RemoveGroup</requireCommand>
+        <requireCommand>RemoveGroupResponse</requireCommand>
+        <requireCommand>RemoveAllGroups</requireCommand>
+        <requireCommand>AddGroupIfIdentifying</requireCommand>
+      </include>
+      <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>BINDING</requireAttribute>
+      </include>
+      <include cluster="Scenes Management" client="true" server="true" clientLocked="true"
+        serverLocked="true">
+        <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+        <requireCommand>AddScene</requireCommand>
+        <requireCommand>AddSceneResponse</requireCommand>
+        <requireCommand>ViewScene</requireCommand>
+        <requireCommand>ViewSceneResponse</requireCommand>
+        <requireCommand>RemoveScene</requireCommand>
+        <requireCommand>RemoveSceneResponse</requireCommand>
+        <requireCommand>RemoveAllScenes</requireCommand>
+        <requireCommand>RemoveAllScenesResponse</requireCommand>
+        <requireCommand>StoreScene</requireCommand>
+        <requireCommand>StoreSceneResponse</requireCommand>
+        <requireCommand>RecallScene</requireCommand>
+        <requireCommand>GetSceneMembership</requireCommand>
+        <requireCommand>GetSceneMembershipResponse</requireCommand>
+        <requireCommand>CopyScene</requireCommand>
+        <requireCommand>CopySceneResponse</requireCommand>
+      </include>
+      <include cluster="On/Off" client="true" server="true" clientLocked="true" serverLocked="true">
+        <features>
+          <feature code="LT" name="Lighting">
+            <mandatoryConform />
+          </feature>
+        </features>
+        <requireAttribute>ON_OFF</requireAttribute>
+        <requireAttribute>GLOBAL_SCENE_CONTROL</requireAttribute>
+        <requireAttribute>ON_TIME</requireAttribute>
+        <requireAttribute>OFF_WAIT_TIME</requireAttribute>
+        <requireAttribute>START_UP_ON_OFF</requireAttribute>
+        <requireCommand>Off</requireCommand>
+        <requireCommand>On</requireCommand>
+        <requireCommand>Toggle</requireCommand>
+        <requireCommand>OffWithEffect</requireCommand>
+        <requireCommand>OnWithRecallGlobalScene</requireCommand>
+        <requireCommand>OnWithTimedOff</requireCommand>
+      </include>
+      <include cluster="Level Control" client="true" server="true" clientLocked="true"
+        serverLocked="true">
+        <features>
+          <feature code="OO" name="OnOff">
+            <mandatoryConform />
+          </feature>
+          <feature code="LT" name="Lighting">
+            <mandatoryConform />
+          </feature>
+        </features>
+        <requireAttribute>CURRENT_LEVEL</requireAttribute>
+        <requireAttribute>OPTIONS</requireAttribute>
+        <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
+        <requireAttribute>ON_LEVEL</requireAttribute>
+        <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
+        <requireCommand>MoveToLevel</requireCommand>
+        <requireCommand>Move</requireCommand>
+        <requireCommand>Step</requireCommand>
+        <requireCommand>Stop</requireCommand>
+        <requireCommand>MoveToLevelWithOnOff</requireCommand>
+        <requireCommand>MoveWithOnOff</requireCommand>
+        <requireCommand>StepWithOnOff</requireCommand>
+        <requireCommand>StopWithOnOff</requireCommand>
+      </include>
+      <include cluster="Color Control" client="true" server="true" clientLocked="true"
+        serverLocked="true">
+        <features>
+          <feature code="HS" name="HueSaturation">
+            <optionalConform />
+          </feature>
+          <feature code="EHUE" name="EnhancedHue">
+            <optionalConform />
+          </feature>
+          <feature code="CL" name="ColorLoop">
+            <optionalConform />
+          </feature>
+          <feature code="XY" name="XY">
+            <mandatoryConform />
+          </feature>
+          <feature code="CT" name="ColorTemperature">
+            <mandatoryConform />
+          </feature>
+        </features>
+        <requireAttribute>COLOR_CONTROL_REMAINING_TIME</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_CURRENT_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_CURRENT_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_TEMPERATURE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_MODE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_OPTIONS</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_NUMBER_OF_PRIMARIES</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_ENHANCED_COLOR_MODE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_CAPABILITIES</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_TEMPERATURE_LEVEL_MIN_MIREDS</requireAttribute>
+        <requireAttribute>START_UP_COLOR_TEMPERATURE_MIREDS</requireAttribute>
+        <requireCommand>MoveToColor</requireCommand>
+        <requireCommand>MoveColor</requireCommand>
+        <requireCommand>StepColor</requireCommand>
+        <requireCommand>MoveToColorTemperature</requireCommand>
+        <requireCommand>StopMoveStep</requireCommand>
+        <requireCommand>MoveColorTemperature</requireCommand>
+        <requireCommand>StepColorTemperature</requireCommand>
+      </include>
+
+    </clusters>
+  </deviceType>
+</configurator>

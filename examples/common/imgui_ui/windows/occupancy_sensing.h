@@ -38,6 +38,8 @@ public:
 
     void UpdateState() override;
     void Render() override;
+    void RenderContent() override;
+    const char * GetDisplayName() const override { return mTitle.c_str(); }
 
 private:
     const chip::EndpointId mEndpointId;

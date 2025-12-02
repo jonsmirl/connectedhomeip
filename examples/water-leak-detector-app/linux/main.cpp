@@ -17,17 +17,34 @@
  */
 
 #include "WaterLeakDetectorAppAttrUpdateDelegate.h"
+#include "WaterLeakDetectorAppBasicInformation.h"
 #include "WaterLeakDetectorManager.h"
 
 #include <AppMain.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <platform/CHIPDeviceConfig.h>
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
 #include <imgui_ui/ui.h>
+#include <imgui_ui/windows/basic_information.h>
 #include <imgui_ui/windows/boolean_state.h>
-#include <imgui_ui/windows/connectivity.h>
-#include <imgui_ui/windows/occupancy_sensing.h>
 #include <imgui_ui/windows/qrcode.h>
+
+// Custom BasicInformation window for water leak detector
+class WaterLeakDetectorBasicInformation : public example::Ui::Windows::BasicInformation
+{
+public:
+    WaterLeakDetectorBasicInformation(chip::EndpointId endpointId) : BasicInformation(endpointId) {}
+
+protected:
+    std::string GetDeviceProductName() const override { return "Water Leak Detector"; }
+    uint16_t GetDeviceProductID() const override { return 0x800B; }
+    std::string GetDeviceNodeLabel() const override { return ""; }
+    std::string GetDeviceProductLabel() const override { return "Water Leak Detector"; }
+    std::string GetDevicePartNumber() const override { return "WLD-001"; }
+    std::string GetDeviceSerialNumber() const override { return "WLD-123456"; }
+    std::string GetDeviceUniqueID() const override { return "WLD-UID-123456"; }
+};
 #endif
 
 static constexpr chip::EndpointId sWaterLeakDetectorEndpointId = 1;
@@ -39,10 +56,17 @@ using namespace chip::app::Clusters;
 namespace {
 NamedPipeCommands sChipNamedPipeCommands;
 WaterLeakDetectorAppAttrUpdateDelegate sWaterLeakDetectorAppAttrUpdateDelegate;
+
+// Custom BasicInformation AttributeAccessInterface for NodeLabel support
+chip::app::Clusters::BasicInformation::WaterLeakDetectorAppBasicInformationAttrAccess gBasicInformationAttrAccess;
 } // namespace
 
 void ApplicationInit()
 {
+    // Register custom BasicInformation AttributeAccessInterface for NodeLabel support
+    chip::app::AttributeAccessInterfaceRegistry::Instance().Register(&gBasicInformationAttrAccess);
+    ChipLogProgress(NotSpecified, "Registered custom BasicInformation AttributeAccessInterface for NodeLabel support");
+
     WaterLeakDetectorManager::InitInstance(sWaterLeakDetectorEndpointId);
 }
 
@@ -60,11 +84,12 @@ int main(int argc, char * argv[])
     }
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
-    example::Ui::ImguiUi ui;
+    // Enable tabbed interface
+    example::Ui::ImguiUi ui(true, false);
 
+    ui.AddWindow(std::make_unique<WaterLeakDetectorBasicInformation>(chip::EndpointId(0)));
+    ui.AddWindow(std::make_unique<example::Ui::Windows::BooleanState>(chip::EndpointId(1), "Water Leak"));
     ui.AddWindow(std::make_unique<example::Ui::Windows::QRCode>());
-    ui.AddWindow(std::make_unique<example::Ui::Windows::Connectivity>());
-    ui.AddWindow(std::make_unique<example::Ui::Windows::BooleanState>(chip::EndpointId(1), "Water Leak Detector"));
 
     ChipLinuxAppMainLoop(&ui);
 #else

@@ -22,7 +22,6 @@
 #include <setup_payload/SetupPayload.h>
 
 #include <string>
-#include <vector>
 
 class SetupPayloadParseCommand : public Command
 {
@@ -33,6 +32,6 @@ public:
 
 private:
     char * mCode;
-    CHIP_ERROR Parse(std::string codeString, std::vector<chip::SetupPayload> & payloads);
-    CHIP_ERROR Print(const chip::SetupPayload & payload);
+    CHIP_ERROR Parse(std::string codeString, chip::SetupPayload & payload);
+    CHIP_ERROR Print(chip::SetupPayload payload);
 };

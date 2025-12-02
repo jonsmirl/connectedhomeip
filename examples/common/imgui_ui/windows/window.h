@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <string>
+
 namespace example {
 namespace Ui {
 
@@ -41,6 +43,16 @@ public:
     // MUST use Imgui rendering, generally within a Begin/End block to
     // create a window.
     virtual void Render() = 0;
+
+    // Render content only (without Begin/End window) for tabbed interface
+    // Default implementation calls Render() for backward compatibility
+    virtual void RenderContent() { Render(); }
+
+    // Get the display name for this window (used in tab titles)
+    virtual const char * GetDisplayName() const = 0;
+
+    // Get the device product name for window title (only implemented by BasicInformation windows)
+    virtual std::string GetDeviceProductNameForTitle() const { return ""; }
 };
 
 } // namespace Ui

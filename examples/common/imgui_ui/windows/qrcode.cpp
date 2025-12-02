@@ -141,6 +141,70 @@ void QRCode::Render()
     ImGui::End();
 }
 
+void QRCode::RenderContent()
+{
+    // Content from Render() method without Begin/End
+    if (!mHasQRCode)
+    {
+        ImGui::Text("MISSING/ERROR!");
+        return;
+    }
+
+    ImDrawList * drawList = ImGui::GetWindowDrawList();
+
+    constexpr int kBorderSize    = 35;
+    constexpr int kMinWindowSize = 200;
+    const int kQRCodeSize        = qrcodegen_getSize(mQRData);
+
+    ImVec2 pos  = ImGui::GetCursorScreenPos();
+    ImVec2 size = ImGui::GetContentRegionAvail();
+
+    if (size.y < kMinWindowSize)
+    {
+        size = ImVec2(kMinWindowSize, kMinWindowSize);
+    }
+
+    // Fill the entire area white, then figure out borders
+    drawList->AddRectFilled(pos, pos + size, IM_COL32_WHITE);
+
+    // add a border
+    if (size.x >= 2 * kBorderSize && size.y >= 2 * kBorderSize)
+    {
+        size.x -= 2 * kBorderSize;
+        size.y -= 2 * kBorderSize;
+        pos.x += kBorderSize;
+        pos.y += kBorderSize;
+    }
+
+    // create a square rectangle: keep only the smaller side and adjust the
+    // other
+    if (size.x > size.y)
+    {
+        pos.x += (size.x - size.y) / 2;
+        size.x = size.y;
+    }
+    else if (size.y > size.x)
+    {
+        pos.y += (size.y - size.x) / 2;
+        size.y = size.x;
+    }
+
+    const ImVec2 squareSize = ImVec2(size.x / static_cast<float>(kQRCodeSize), size.y / static_cast<float>(kQRCodeSize));
+
+    for (int y = 0; y < kQRCodeSize; ++y)
+    {
+        for (int x = 0; x < kQRCodeSize; ++x)
+        {
+            if (qrcodegen_getModule(mQRData, x, y))
+            {
+                ImVec2 placement =
+                    ImVec2(pos.x + static_cast<float>(x) * squareSize.x, pos.y + static_cast<float>(y) * squareSize.y);
+                drawList->AddRectFilled(placement, placement + squareSize, IM_COL32_BLACK);
+            }
+        }
+    }
+}
+
 } // namespace Windows
 } // namespace Ui
 } // namespace example

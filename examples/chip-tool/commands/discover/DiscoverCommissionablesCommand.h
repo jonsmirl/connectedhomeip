@@ -20,8 +20,6 @@
 
 #include "../common/CHIPCommand.h"
 
-#include <lib/dnssd/Advertiser.h>
-
 class DiscoverCommissionablesCommandBase : public CHIPCommand, public chip::Controller::DeviceDiscoveryDelegate
 {
 public:
@@ -40,8 +38,6 @@ public:
 
 protected:
     chip::Controller::DeviceCommissioner * mCommissioner;
-
-    chip::Optional<uint64_t> mCommissioningMode;
 
 private:
     chip::Optional<bool> mDiscoverOnce;
@@ -125,12 +121,7 @@ class DiscoverCommissionableByCommissioningModeCommand : public DiscoverCommissi
 public:
     DiscoverCommissionableByCommissioningModeCommand(CredentialIssuerCommands * credsIssuerConfig) :
         DiscoverCommissionablesCommandBase("find-commissionable-by-commissioning-mode", credsIssuerConfig)
-    {
-        AddArgument("commissioning-mode", chip::to_underlying(chip::Dnssd::CommissioningMode::kEnabledBasic),
-                    chip::to_underlying(chip::Dnssd::CommissioningMode::kEnabledJointFabric), &mCommissioningMode,
-                    "Optional integer value representing the commissioning mode to filter devices. If provided, only devices with "
-                    "the specified commissioning mode will be discovered.");
-    }
+    {}
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;

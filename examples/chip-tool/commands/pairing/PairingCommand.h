@@ -27,7 +27,6 @@
 #include <lib/support/ThreadOperationalDataset.h>
 
 #include <optional>
-#include <thread>
 
 enum class PairingMode
 {
@@ -63,8 +62,7 @@ public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType,
                    CredentialIssuerCommands * credIssuerCmds,
                    chip::Dnssd::DiscoveryFilterType filterType = chip::Dnssd::DiscoveryFilterType::kNone) :
-        CHIPCommand(commandName, credIssuerCmds),
-        mPairingMode(mode), mNetworkType(networkType), mFilterType(filterType),
+        CHIPCommand(commandName, credIssuerCmds), mPairingMode(mode), mNetworkType(networkType), mFilterType(filterType),
         mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() }, mComplex_TimeZones(&mTimeZoneList),
         mComplex_DSTOffsets(&mDSTOffsetList), mCurrentFabricRemoveCallback(OnCurrentFabricRemove, this)
     {
@@ -116,9 +114,7 @@ public:
         case PairingMode::CodePaseOnly:
             AddArgument("payload", &mOnboardingPayload);
             AddArgument("discover-once", 0, 1, &mDiscoverOnce);
-            AddArgument("use-only-onnetwork-discovery", 0, 1, &mUseOnlyOnNetworkDiscovery,
-                        "Whether to only use DNS-SD for discovery. The default is true if no network credentials are provided, "
-                        "false otherwise.");
+            AddArgument("use-only-onnetwork-discovery", 0, 1, &mUseOnlyOnNetworkDiscovery);
             break;
         case PairingMode::Ble:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
@@ -134,6 +130,9 @@ public:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("pase-only", 0, 1, &mPaseOnly);
+            // Optional flag-style discriminator for onnetwork (e.g. --discriminator 3843)
+            AddArgument("discriminator", 0, 4096, &mOnNetworkDiscriminator,
+                        "Filter by long discriminator (optional; use --discriminator N)");
             break;
         case PairingMode::SoftAP:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
@@ -246,9 +245,6 @@ public:
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
     void OnICDRegistrationComplete(chip::ScopedNodeId deviceId, uint32_t icdCounter) override;
     void OnICDStayActiveComplete(chip::ScopedNodeId deviceId, uint32_t promisedActiveDuration) override;
-    void OnCommissioningStageStart(chip::PeerId peerId, chip::Controller::CommissioningStage stageStarting) override;
-    CHIP_ERROR WiFiCredentialsNeeded(chip::EndpointId endpoint) override;
-    CHIP_ERROR ThreadCredentialsNeeded(chip::EndpointId endpoint) override;
 
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData) override;
@@ -305,6 +301,9 @@ private:
     chip::Optional<char *> mApFreqStr;
 #endif
     uint16_t mRemotePort = 0;
+    // Optional long discriminator flag for onnetwork variant
+    chip::Optional<uint16_t> mOnNetworkDiscriminator;
+
     // mDiscriminator is only used for some situations, but in those situations
     // it's mandatory.  Track whether we're actually using it; the cases that do
     // will emplace this optional.
@@ -330,10 +329,4 @@ private:
 
     static void OnCurrentFabricRemove(void * context, NodeId remoteNodeId, CHIP_ERROR status);
     void PersistIcdInfo();
-
-    std::optional<std::thread> mPrompterThread;
-
-    std::string mPromptedSSID;
-    std::string mPromptedPassword;
-    std::string mPromptedOperationalDataset;
 };

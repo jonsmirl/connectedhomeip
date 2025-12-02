@@ -48,6 +48,12 @@ void BooleanState::UpdateState()
 void BooleanState::Render()
 {
     ImGui::Begin(mTitle.c_str());
+    RenderContent();
+    ImGui::End();
+}
+
+void BooleanState::RenderContent()
+{
     ImGui::Text("On Endpoint %d", mEndpointId);
 
     bool uiState = mState;
@@ -58,8 +64,6 @@ void BooleanState::Render()
         // toggle value on the next 'UpdateState' call
         mTargetState.SetValue(uiState);
     }
-
-    ImGui::End();
 }
 
 } // namespace Windows

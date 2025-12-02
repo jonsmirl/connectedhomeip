@@ -102,3 +102,48 @@ static_library("occupancy_sensing") {
 
   public_configs = [ "${chip_root}/src:includes" ]
 }
+
+# Custom windows added for extended device UI support
+static_library("basic_information") {
+  sources = [
+    "basic_information.cpp",
+    "basic_information.h",
+  ]
+
+  deps = [
+    ":windows",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/third_party/imgui",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
+static_library("group_management") {
+  sources = [
+    "group_management.cpp",
+    "group_management.h",
+  ]
+
+  deps = [
+    ":windows",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/third_party/imgui",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
+static_library("color_control_debug") {
+  sources = [
+    "color_control_debug.cpp",
+    "color_control_debug.h",
+  ]
+
+  deps = [
+    ":windows",
+    "${chip_root}/third_party/imgui",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}

@@ -13,10 +13,30 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
 import("${chip_root}/src/app/chip_data_model.gni")
 
+config("config") {
+  include_dirs = [ "include" ]
+}
+
+source_set("sources") {
+  sources = [
+    "${chip_root}/examples/temperature-measurement-app/temperature-measurement-common/include/TemperatureMeasurementAppAttrUpdateDelegate.h",
+    "${chip_root}/examples/temperature-measurement-app/temperature-measurement-common/include/TemperatureMeasurementManager.h",
+    "${chip_root}/examples/temperature-measurement-app/temperature-measurement-common/src/TemperatureMeasurementAppAttrUpdateDelegate.cpp",
+    "${chip_root}/examples/temperature-measurement-app/temperature-measurement-common/src/TemperatureMeasurementManager.cpp",
+  ]
+
+  deps = [
+    "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/lib",
+    "${chip_root}/third_party/jsoncpp",
+  ]
+
+  public_configs = [ ":config" ]
+}
+
 chip_data_model("temperature-measurement-common") {
-  zap_file = "temperature-measurement.zap"
+  zap_file = "temperature-measurement-app.zap"
   is_server = true
 }

@@ -52,34 +52,25 @@ const char * CustomFlowString(CommissioningFlow flow)
 CHIP_ERROR SetupPayloadParseCommand::Run()
 {
     std::string codeString(mCode);
-    std::vector<SetupPayload> payloads;
+    SetupPayload payload;
 
-    ReturnErrorOnFailure(Parse(codeString, payloads));
-    bool firstTime = true;
-    for (auto & payload : payloads)
-    {
-        if (!firstTime)
-        {
-            ChipLogProgress(SetupPayload, "----------");
-        }
-        ReturnErrorOnFailure(Print(payload));
-        firstTime = false;
-    }
+    ReturnErrorOnFailure(Parse(codeString, payload));
+    ReturnErrorOnFailure(Print(payload));
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SetupPayloadParseCommand::Parse(std::string codeString, std::vector<SetupPayload> & payloads)
+CHIP_ERROR SetupPayloadParseCommand::Parse(std::string codeString, chip::SetupPayload & payload)
 {
     bool isQRCode = IsQRCode(codeString);
 
     ChipLogDetail(SetupPayload, "Parsing %sRepresentation: %s", isQRCode ? "base38" : "decimal", codeString.c_str());
 
-    return isQRCode ? QRCodeSetupPayloadParser(codeString).populatePayloads(payloads)
-                    : ManualSetupPayloadParser(codeString).populatePayload(payloads.emplace_back());
+    return isQRCode ? QRCodeSetupPayloadParser(codeString).populatePayload(payload)
+                    : ManualSetupPayloadParser(codeString).populatePayload(payload);
 }
 
-CHIP_ERROR SetupPayloadParseCommand::Print(const SetupPayload & payload)
+CHIP_ERROR SetupPayloadParseCommand::Print(chip::SetupPayload payload)
 {
     ChipLogProgress(SetupPayload, "Version:             %u", payload.version);
     ChipLogProgress(SetupPayload, "VendorID:            %u", payload.vendorID);
@@ -124,14 +115,6 @@ CHIP_ERROR SetupPayloadParseCommand::Print(const SetupPayload & payload)
                         humanFlags.Add(", ");
                     }
                     humanFlags.Add("Wi-Fi PAF");
-                }
-                if (payload.rendezvousInformation.Value().Has(RendezvousInformationFlag::kNFC))
-                {
-                    if (!humanFlags.Empty())
-                    {
-                        humanFlags.Add(", ");
-                    }
-                    humanFlags.Add("NFC");
                 }
             }
             else

@@ -31,6 +31,8 @@ class QRCode : public Window
 public:
     void LoadInitialState() override;
     void Render() override;
+    void RenderContent() override;
+    const char * GetDisplayName() const override { return "QR Code"; }
 
 private:
     static constexpr int kQRCodeVersion   = qrcodegen_VERSION_MAX;

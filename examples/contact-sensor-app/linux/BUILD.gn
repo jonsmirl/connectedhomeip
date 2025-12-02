@@ -31,6 +31,7 @@ executable("contact-sensor-app") {
   sources = [
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
+    "ContactSensorAppBasicInformation.cpp",
   ]
 
   deps = [
@@ -42,6 +43,7 @@ executable("contact-sensor-app") {
   if (chip_examples_enable_imgui_ui) {
     deps += [
       "${chip_root}/examples/common/imgui_ui",
+      "${chip_root}/examples/common/imgui_ui/windows:basic_information",
       "${chip_root}/examples/common/imgui_ui/windows:boolean_state",
       "${chip_root}/examples/common/imgui_ui/windows:connectivity",
       "${chip_root}/examples/common/imgui_ui/windows:occupancy_sensing",

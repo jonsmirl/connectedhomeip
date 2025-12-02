@@ -22,19 +22,53 @@
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl2.h>
 
+#include <app/server/Server.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <atomic>
+#include <iomanip>
+#include <list>
+#include <sstream>
 #include <thread>
 
 namespace example {
 namespace Ui {
 namespace {
 
+std::string GetNodeIdHexString()
+{
+    // Get the nodeId from the first fabric in the fabric table
+    for (const auto & fabric : chip::Server::GetInstance().GetFabricTable())
+    {
+        chip::NodeId nodeId = fabric.GetNodeId();
+        if (nodeId != chip::kUndefinedNodeId)
+        {
+            std::stringstream ss;
+            ss << "0x" << std::hex << std::uppercase << nodeId;
+            return ss.str();
+        }
+    }
+    return "Generic Matter Device"; // Fallback if no nodeId available
+}
+
+std::string GetDeviceTitleFromWindows(const std::list<std::unique_ptr<example::Ui::Window>> & windows)
+{
+    // Look for BasicInformation window to get device name
+    for (const auto & window : windows)
+    {
+        std::string productName = window->GetDeviceProductNameForTitle();
+        if (!productName.empty())
+        {
+            return productName;
+        }
+    }
+    return "Generic Matter Device"; // Fallback if no BasicInformation window found
+}
+
 // Controls running the UI event loop
 std::atomic<bool> gUiRunning{ false };
 
-void UiInit(SDL_GLContext * gl_context, SDL_Window ** window)
+void UiInit(SDL_GLContext * gl_context, SDL_Window ** window, bool useFullScreen = false, bool useTabbedInterface = false)
 {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
     {
@@ -61,8 +95,20 @@ void UiInit(SDL_GLContext * gl_context, SDL_Window ** window)
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-    SDL_WindowFlags window_flags = (SDL_WindowFlags) (SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    *window     = SDL_CreateWindow("Light UI", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
+
+    SDL_WindowFlags window_flags = (SDL_WindowFlags) (SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
+
+    if (useFullScreen)
+    {
+        window_flags = (SDL_WindowFlags) (window_flags | SDL_WINDOW_FULLSCREEN_DESKTOP);
+    }
+    else
+    {
+        window_flags = (SDL_WindowFlags) (window_flags | SDL_WINDOW_RESIZABLE);
+    }
+
+    std::string windowTitle = "Matter Device Control - " + GetNodeIdHexString();
+    *window     = SDL_CreateWindow(windowTitle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 450, 450, window_flags);
     *gl_context = SDL_GL_CreateContext(*window);
     SDL_GL_MakeCurrent(*window, *gl_context);
     SDL_GL_SetSwapInterval(1); // Enable vsync
@@ -93,18 +139,28 @@ void UiShutdown(SDL_GLContext * gl_context, SDL_Window ** window)
     SDL_Quit();
 }
 
+// Target frame time in milliseconds (60 FPS = ~16.67ms per frame)
+// Using 16ms as a floor to ensure we don't spin faster than 60fps
+// when vsync doesn't work (common in WSL/WSLg environments)
+constexpr Uint32 kTargetFrameTimeMs = 16;
+
 void EventLoop(ImguiUi * ui)
 {
     gUiRunning = true;
     SDL_GLContext gl_context;
     SDL_Window * window = nullptr;
 
-    UiInit(&gl_context, &window);
+    UiInit(&gl_context, &window, ui->GetUseFullScreen(), ui->GetUseTabbedInterface());
+
+    // Set the SDL window reference so we can update the title later
+    ui->SetSDLWindow(window);
 
     ImGuiIO & io = ImGui::GetIO();
 
     while (gUiRunning.load())
     {
+        Uint32 frameStart = SDL_GetTicks();
+
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
@@ -131,6 +187,14 @@ void EventLoop(ImguiUi * ui)
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
+
+        // Manual frame rate limiting for environments where vsync doesn't work
+        // (e.g., WSL/WSLg). This ensures we don't spin at 100% CPU.
+        Uint32 frameTime = SDL_GetTicks() - frameStart;
+        if (frameTime < kTargetFrameTimeMs)
+        {
+            SDL_Delay(kTargetFrameTimeMs - frameTime);
+        }
     }
 
     UiShutdown(&gl_context, &window);
@@ -199,10 +263,54 @@ void ImguiUi::ChipLoopLoadInitialState()
 
 void ImguiUi::Render()
 {
-    for (auto it = mWindows.begin(); it != mWindows.end(); it++)
+    if (mUseTabbedInterface)
     {
-        (*it)->Render();
+        RenderTabbed();
     }
+    else
+    {
+        // Original separate windows rendering
+        for (auto it = mWindows.begin(); it != mWindows.end(); it++)
+        {
+            (*it)->Render();
+        }
+    }
+}
+
+void ImguiUi::RenderTabbed()
+{
+    // Create a full-screen window using available screen space
+    ImGuiIO & io = ImGui::GetIO();
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(io.DisplaySize);
+
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBringToFrontOnFocus;
+
+    ImGui::Begin(GetDeviceTitle().c_str(), nullptr, window_flags);
+
+    // Create tab bar
+    if (ImGui::BeginTabBar("DeviceControlTabs", ImGuiTabBarFlags_None))
+    {
+        int tabIndex = 0;
+        for (auto it = mWindows.begin(); it != mWindows.end(); it++, tabIndex++)
+        {
+            const char * tabName = (*it)->GetDisplayName();
+            if (ImGui::BeginTabItem(tabName))
+            {
+                mCurrentTab = tabIndex;
+
+                // Render the content of the selected tab
+                (*it)->RenderContent();
+
+                ImGui::EndTabItem();
+            }
+        }
+
+        ImGui::EndTabBar();
+    }
+
+    ImGui::End();
 }
 
 void ImguiUi::ChipLoopUpdateCallback(intptr_t self)
@@ -224,6 +332,20 @@ void ImguiUi::UpdateState()
 
     // ensure update is done when exiting
     sem_wait(&mChipLoopWaitSemaphore);
+}
+
+std::string ImguiUi::GetDeviceTitle() const
+{
+    return GetDeviceTitleFromWindows(mWindows);
+}
+
+void ImguiUi::UpdateSDLWindowTitle()
+{
+    if (mSDLWindow != nullptr)
+    {
+        std::string windowTitle = GetDeviceTitle();
+        SDL_SetWindowTitle(mSDLWindow, windowTitle.c_str());
+    }
 }
 
 } // namespace Ui

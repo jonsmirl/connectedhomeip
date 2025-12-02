@@ -33,6 +33,7 @@ public:
     void LoadInitialState() override;
     void UpdateState() override;
     void Render() override;
+    const char * GetDisplayName() const override { return "Connectivity"; }
 
 private:
     void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event);

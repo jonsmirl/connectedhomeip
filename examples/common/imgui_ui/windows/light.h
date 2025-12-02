@@ -40,6 +40,8 @@ public:
 
     void UpdateState() override;
     void Render() override;
+    void RenderContent() override;
+    const char * GetDisplayName() const override { return "Light Control"; }
 
 private:
     const chip::EndpointId mEndpointId;

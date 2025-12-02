@@ -54,6 +54,12 @@ config("config") {
   cflags = [ "-Wconversion" ]
 }
 
+config("supabase_config") {
+  defines = [
+    "CONFIG_ENABLE_SUPABASE_INTEGRATION=1",
+  ]
+}
+
 static_library("chip-tool-utils") {
   sources = [
     "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
@@ -83,7 +89,9 @@ static_library("chip-tool-utils") {
     "commands/dcl/JsonSchemaMacros.cpp",
     "commands/dcl/JsonSchemaMacros.h",
     "commands/delay/SleepCommand.cpp",
+
     "commands/delay/WaitForCommissioneeCommand.cpp",
+
     "commands/discover/DiscoverCommand.cpp",
     "commands/discover/DiscoverCommissionablesCommand.cpp",
     "commands/discover/DiscoverCommissionersCommand.cpp",
@@ -100,9 +108,22 @@ static_library("chip-tool-utils") {
     "commands/session-management/CloseSessionCommand.cpp",
     "commands/session-management/CloseSessionCommand.h",
     "commands/storage/StorageManagementCommand.cpp",
+    "commands/example/CredentialIssuerStructs.h",
+    "commands/example/CredentialIssuerStructs.cpp",
+    "commands/example/SupabaseCredentialIssuerCommands.cpp",
+    "commands/example/SupabaseCredentialIssuerCommands.h",
+    "commands/example/SupabaseOperationalCredentialsIssuer.cpp",
+    "commands/example/SupabaseOperationalCredentialsIssuer.h",
+    "commands/example/SupabaseClient.cpp",
+    "commands/example/SupabaseClient.h",
   ]
 
-  deps = [ "${chip_root}/src/app:events" ]
+  deps = [
+    "${chip_root}/src/app:events",
+    "${chip_root}/third_party/jsoncpp",
+  ]
+
+
 
   if (config_use_interactive_mode) {
     sources += [ "commands/interactive/InteractiveCommands.cpp" ]
@@ -138,7 +159,10 @@ static_library("chip-tool-utils") {
     "${chip_root}/third_party/jsoncpp",
   ]
 
-  public_configs = [ ":config" ]
+  public_configs = [
+    ":config",
+    ":supabase_config",
+  ]
 
   if (chip_enable_transport_trace) {
     public_deps +=

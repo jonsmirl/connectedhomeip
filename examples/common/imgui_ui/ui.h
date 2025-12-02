@@ -24,6 +24,9 @@
 #include <list>
 #include <memory>
 
+// Forward declarations
+struct SDL_Window;
+
 namespace example {
 namespace Ui {
 
@@ -35,13 +38,42 @@ namespace Ui {
 class ImguiUi : public AppMainLoopImplementation
 {
 public:
-    ImguiUi() { sem_init(&mChipLoopWaitSemaphore, 0 /* shared */, 0); }
+    ImguiUi(bool useTabbedInterface = false, bool useFullScreen = false) :
+        mUseTabbedInterface(useTabbedInterface), mUseFullScreen(useFullScreen)
+    {
+        sem_init(&mChipLoopWaitSemaphore, 0 /* shared */, 0);
+    }
     virtual ~ImguiUi() { sem_destroy(&mChipLoopWaitSemaphore); }
 
-    void AddWindow(std::unique_ptr<Window> window) { mWindows.push_back(std::move(window)); }
+    void AddWindow(std::unique_ptr<Window> window)
+    {
+        mWindows.push_back(std::move(window));
+        // Update title when windows are added (if SDL window is available)
+        if (mSDLWindow != nullptr)
+        {
+            UpdateSDLWindowTitle();
+        }
+    }
 
-    void UpdateState(); // runs a state update from ember/app
-    void Render();      // render windows to screen
+    void SetSDLWindow(SDL_Window * window)
+    {
+        mSDLWindow = window;
+        // Update title when SDL window is set (if we have windows)
+        if (!mWindows.empty())
+        {
+            UpdateSDLWindowTitle();
+        }
+    }
+    void UpdateSDLWindowTitle();
+
+    void UpdateState();  // runs a state update from ember/app
+    void Render();       // render windows to screen
+    void RenderTabbed(); // render as tabbed interface
+
+    // Getters for configuration
+    bool GetUseTabbedInterface() const { return mUseTabbedInterface; }
+    bool GetUseFullScreen() const { return mUseFullScreen; }
+    std::string GetDeviceTitle() const;
 
     // AppMainLoopImplementation
     void RunMainLoop() override;
@@ -57,6 +89,12 @@ private:
 
     sem_t mChipLoopWaitSemaphore;
     std::list<std::unique_ptr<Window>> mWindows;
+    SDL_Window * mSDLWindow = nullptr;
+
+    // Tabbed interface configuration
+    bool mUseTabbedInterface;
+    bool mUseFullScreen;
+    int mCurrentTab = 0;
 
     static void ChipLoopUpdateCallback(intptr_t self);
 };

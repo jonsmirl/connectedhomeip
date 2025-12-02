@@ -15,6 +15,10 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/third_party/imgui/imgui.gni")
+
 config("includes") {
   include_dirs = [
     ".",
@@ -28,6 +32,7 @@ executable("chip-microwave-oven-app") {
     "${chip_root}/examples/microwave-oven-app/microwave-oven-common/src/microwave-oven-device.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
+    "MicrowaveOvenAppBasicInformation.cpp",
   ]
 
   deps = [
@@ -40,6 +45,15 @@ executable("chip-microwave-oven-app") {
     "include",
     "${chip_root}/examples/microwave-oven-app/microwave-oven-common/include",
   ]
+
+  if (chip_examples_enable_imgui_ui) {
+    deps += [
+      "${chip_root}/examples/common/imgui_ui",
+      "${chip_root}/examples/common/imgui_ui/windows:basic_information",
+      "${chip_root}/examples/common/imgui_ui/windows:qrcode",
+    ]
+  }
+
   output_dir = root_out_dir
 }
 

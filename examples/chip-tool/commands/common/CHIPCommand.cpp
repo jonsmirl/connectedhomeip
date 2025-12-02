@@ -158,11 +158,6 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
         port = static_cast<uint16_t>(port + CurrentCommissionerId());
     }
     factoryInitParams.listenPort = port;
-    if (mInterfaceId.HasValue())
-    {
-        factoryInitParams.interfaceId =
-            chip::Inet::InterfaceId(static_cast<chip::Inet::InterfaceId::PlatformType>(mInterfaceId.Value()));
-    }
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
     auto systemState = chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState();
@@ -538,11 +533,15 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
 
         ReturnLogErrorOnFailure(chip::GroupTesting::InitData(&sGroupDataProvider, fabricIndex, compressed_fabric_id_span));
 
-        // Configure the default IPK for all fabrics used by CHIP-tool. The epoch
-        // key is the same, but the derived keys will be different for each fabric.
-        chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+        // Configure the IPK to match the M2 app's expected value ("1234567890123456").
+        // This must match the IPK provided during AddNOC by FirebaseOperationalCredentialsIssuer.
+        static constexpr uint8_t kM2Ipk[16] = {
+            0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, // "12345678"
+            0x39, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36  // "90123456"
+        };
+        chip::ByteSpan m2Ipk(kM2Ipk, sizeof(kM2Ipk));
         ReturnLogErrorOnFailure(
-            chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricIndex, defaultIpk, compressed_fabric_id_span));
+            chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricIndex, m2Ipk, compressed_fabric_id_span));
     }
 
     CHIPCommand::sICDClientStorage.UpdateFabricList(commissioner->GetFabricIndex());
