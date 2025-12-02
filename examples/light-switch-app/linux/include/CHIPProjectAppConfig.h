@@ -116,9 +116,9 @@
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
  *
- * Enable support for Chip-over-BLE (CHIPoBLE).
+ * Disable support for Chip-over-BLE (CHIPoBLE) - using IP-only commissioning.
  */
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
+#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC

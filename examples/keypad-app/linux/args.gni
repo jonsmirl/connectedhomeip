@@ -17,6 +17,14 @@ import("//build_overrides/chip.gni")
 # Import args from chip
 import("${chip_root}/config/standalone/args.gni")
 
+chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
+chip_project_config_include = "<CHIPProjectAppConfig.h>"
+chip_system_project_config_include = "<SystemProjectConfig.h>"
+
+chip_project_config_include_dirs =
+    [ "${chip_root}/examples/keypad-app/linux/include" ]
+chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
+
 # Keypad app specific configuration
 chip_examples_enable_imgui_ui = true
 

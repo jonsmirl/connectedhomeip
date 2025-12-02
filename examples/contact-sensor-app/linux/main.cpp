@@ -21,10 +21,25 @@
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
 #include <imgui_ui/ui.h>
+#include <imgui_ui/windows/basic_information.h>
 #include <imgui_ui/windows/boolean_state.h>
-#include <imgui_ui/windows/connectivity.h>
-#include <imgui_ui/windows/occupancy_sensing.h>
 #include <imgui_ui/windows/qrcode.h>
+
+// Custom BasicInformation window for contact sensor
+class ContactSensorBasicInformation : public example::Ui::Windows::BasicInformation
+{
+public:
+    ContactSensorBasicInformation(chip::EndpointId endpointId) : BasicInformation(endpointId) {}
+
+protected:
+    std::string GetDeviceProductName() const override { return "Contact Sensor"; }
+    uint16_t GetDeviceProductID() const override { return 0x800F; }
+    std::string GetDeviceNodeLabel() const override { return ""; }
+    std::string GetDeviceProductLabel() const override { return "Contact Sensor"; }
+    std::string GetDevicePartNumber() const override { return "CS-001"; }
+    std::string GetDeviceSerialNumber() const override { return "CS-123456"; }
+    std::string GetDeviceUniqueID() const override { return "CS-UID-123456"; }
+};
 #endif
 
 using namespace chip;
@@ -40,12 +55,12 @@ int main(int argc, char * argv[])
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
-    example::Ui::ImguiUi ui;
+    // Enable tabbed interface
+    example::Ui::ImguiUi ui(true, false);
 
+    ui.AddWindow(std::make_unique<ContactSensorBasicInformation>(chip::EndpointId(0)));
     ui.AddWindow(std::make_unique<example::Ui::Windows::QRCode>());
-    ui.AddWindow(std::make_unique<example::Ui::Windows::Connectivity>());
     ui.AddWindow(std::make_unique<example::Ui::Windows::BooleanState>(chip::EndpointId(1), "Contact Sensor"));
-    ui.AddWindow(std::make_unique<example::Ui::Windows::OccupancySensing>(chip::EndpointId(1), "Occupancy"));
 
     ChipLinuxAppMainLoop(&ui);
 #else

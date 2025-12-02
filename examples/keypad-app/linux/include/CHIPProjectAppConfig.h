@@ -27,9 +27,6 @@
 
 #pragma once
 
-// include the CHIPProjectConfig from config/standalone
-#include <CHIPProjectConfig.h>
-
 // Keypad device combines both light and switch functionality
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY 1
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT 1
@@ -121,9 +118,9 @@
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
  *
- * Enable support for Chip-over-BLE (CHIPoBLE).
+ * Disable support for Chip-over-BLE (CHIPoBLE) - using IP-only commissioning.
  */
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
+#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
@@ -159,3 +156,6 @@
 
 // Enable default scene handlers for lighting clusters
 #define CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS 1
+
+// include the CHIPProjectConfig from config/standalone (at end to let our defines take precedence)
+#include <CHIPProjectConfig.h>

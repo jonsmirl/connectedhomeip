@@ -139,10 +139,10 @@ void UiShutdown(SDL_GLContext * gl_context, SDL_Window ** window)
     SDL_Quit();
 }
 
-// Target frame time in milliseconds (60 FPS = ~16.67ms per frame)
-// Using 16ms as a floor to ensure we don't spin faster than 60fps
-// when vsync doesn't work (common in WSL/WSLg environments)
-constexpr Uint32 kTargetFrameTimeMs = 16;
+// Target frame time in milliseconds (10 FPS = 100ms per frame)
+// Using 100ms to reduce CPU usage - device control UIs don't need high frame rates
+// This is especially important in WSL/WSLg environments where vsync doesn't work
+constexpr Uint32 kTargetFrameTimeMs = 100;
 
 void EventLoop(ImguiUi * ui)
 {

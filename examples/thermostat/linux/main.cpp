@@ -25,6 +25,28 @@
 
 #include "thermostat-delegate-impl.h"
 
+#if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
+#include <imgui_ui/ui.h>
+#include <imgui_ui/windows/basic_information.h>
+#include <imgui_ui/windows/qrcode.h>
+
+// Custom BasicInformation window for thermostat
+class ThermostatBasicInformation : public example::Ui::Windows::BasicInformation
+{
+public:
+    ThermostatBasicInformation(chip::EndpointId endpointId) : BasicInformation(endpointId) {}
+
+protected:
+    std::string GetDeviceProductName() const override { return "Thermostat"; }
+    uint16_t GetDeviceProductID() const override { return 0x800E; }
+    std::string GetDeviceNodeLabel() const override { return ""; }
+    std::string GetDeviceProductLabel() const override { return "Thermostat"; }
+    std::string GetDevicePartNumber() const override { return "TH-001"; }
+    std::string GetDeviceSerialNumber() const override { return "TH-123456"; }
+    std::string GetDeviceUniqueID() const override { return "TH-UID-123456"; }
+};
+#endif
+
 using namespace chip;
 using namespace chip::app;
 // using namespace chip::app::Clusters;
@@ -78,7 +100,19 @@ void ApplicationShutdown() {}
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+
+#if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
+    // Enable tabbed interface
+    example::Ui::ImguiUi ui(true, false);
+
+    ui.AddWindow(std::make_unique<ThermostatBasicInformation>(chip::EndpointId(0)));
+    ui.AddWindow(std::make_unique<example::Ui::Windows::QRCode>());
+
+    ChipLinuxAppMainLoop(&ui);
+#else
     ChipLinuxAppMainLoop();
+#endif
+
     return 0;
 }
 

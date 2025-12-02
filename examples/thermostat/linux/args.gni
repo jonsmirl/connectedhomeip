@@ -15,4 +15,22 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/config/standalone/args.gni")
+
+chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
+chip_project_config_include = "<CHIPProjectAppConfig.h>"
+chip_system_project_config_include = "<SystemProjectConfig.h>"
+
+chip_project_config_include_dirs =
+    [ "${chip_root}/examples/thermostat/linux/include" ]
+chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
+
+# Use platform mDNS (Avahi) instead of minimal mDNS
+chip_mdns = "platform"
+
+# Enable ImGui UI
+chip_examples_enable_imgui_ui = true
+
+# Disable BLE support (IP-only commissioning)
+chip_config_network_layer_ble = false
+
 matter_enable_tracing_support = true
