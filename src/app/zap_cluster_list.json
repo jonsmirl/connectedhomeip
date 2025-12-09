@@ -368,8 +368,7 @@
         "WI_FI_NETWORK_DIAGNOSTICS_CLUSTER": [],
         "ZONE_MANAGEMENT_CLUSTER": ["zone-management-server"],
         "LOWPAN_BLE_SENSOR_CLUSTER": ["lowpan-ble-sensor-server"],
-        "LOWPAN_GROUP_CLUSTER": ["lowpan-group-server"],
-        "LOWPAN_LOCATION_CLUSTER": ["lowpan-location-server"],
-        "LOWPAN_WEB_SERVER_CLUSTER": ["lowpan-web-server"]
+        "LOWPAN_PROXY_MODE_CLUSTER": ["lowpan-proxy-mode-server"],
+        "LOWPAN_HARDWARE_MODE_CLUSTER": ["lowpan-hardware-mode-server"]
     }
 }

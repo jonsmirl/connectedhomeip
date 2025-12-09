@@ -10,7 +10,7 @@
   </struct>
 
   <cluster>
-    <domain>General</domain>
+    <domain>Lowpan</domain>
     <name>Lowpan BLE Sensor</name>
     <code>0xFFF2FC03</code>
     <define>LOWPAN_BLE_SENSOR_CLUSTER</define>
@@ -41,47 +41,7 @@
   </cluster>
 
   <cluster>
-    <domain>General</domain>
-    <name>Lowpan Group</name>
-    <code>0xFFF2FC01</code>
-    <define>LOWPAN_GROUP_CLUSTER</define>
-    <description>The Lowpan Group cluster provides facilities to manage group endpoints including
-      adding and removing group endpoints with associated names.</description>
-    <client init="false" tick="false">true</client>
-    <server init="false" tick="false">true</server>
-    <globalAttribute code="0xFFFD" side="either" value="1" />
-
-    <!-- Attributes -->
-    <!-- Status attribute is commented out in the implementation
-    <attribute side="server" code="0x0000" define="STATUS" type="array"
-    optional="false">Status</attribute>
-    -->
-
-    <!-- Commands -->
-    <command source="client" code="0x0000" name="AddGroupEp" optional="false">
-      <description>
-        Command to add a new group endpoint with the specified endpoint ID and group name.
-      </description>
-      <arg name="endpoint" type="int16u" />
-      <arg name="groupName" type="char_string" />
-    </command>
-
-    <command source="client" code="0x0001" name="RemoveGroupEp" optional="false">
-      <description>
-        Command to remove an existing group endpoint by its endpoint ID.
-      </description>
-      <arg name="endpoint" type="int16u" />
-    </command>
-
-    <command source="client" code="0x0002" name="Configuration" optional="false">
-      <description>
-        Configuration command for group management settings.
-      </description>
-    </command>
-  </cluster>
-
-  <cluster>
-    <domain>General</domain>
+    <domain>Lowpan</domain>
     <name>Lowpan Location</name>
     <code>0xFFF2FC02</code>
     <define>LOWPAN_LOCATION_CLUSTER</define>
@@ -99,23 +59,105 @@
       writable="false" default="" optional="false">Timezone</attribute>
   </cluster>
 
+  <enum name="ModeTag" type="enum16">
+    <cluster code="0xFFF2FC05"/>
+    <!-- Lowpan Hardware Mode tags (0x8000+ for manufacturer-specific) -->
+    <item value="0x8000" name="NoLoad"/>
+    <item value="0x8001" name="Switch"/>
+    <item value="0x8002" name="MLV"/>
+    <item value="0x8003" name="ELV"/>
+    <item value="0x8004" name="LED"/>
+    <item value="0x8005" name="SmartBulb"/>
+  </enum>
+
   <cluster>
-    <domain>General</domain>
-    <name>Lowpan Web Server</name>
-    <code>0xFFF2FC04</code>
-    <define>LOWPAN_WEB_SERVER_CLUSTER</define>
-    <description>The Web Server cluster provides facilities to configure and control an embedded web
-      server including enable/disable functionality and hostname configuration with automatic mDNS
-      registration.</description>
+    <domain>Lowpan</domain>
+    <name>Lowpan Hardware Mode</name>
+    <code>0xFFF2FC05</code>
+    <define>LOWPAN_HARDWARE_MODE_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
-    <globalAttribute code="0xFFFD" side="either" value="1" />
+    <description>Lowpan hardware load type selection for dimmer endpoints with physical lighting hardware. Controls dimming method based on connected load type.</description>
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
 
-    <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="ENABLE" type="boolean" writable="false"
-      default="false" optional="false">Enable</attribute>
-    <attribute side="server" code="0x0001" define="HOSTNAME" type="char_string" length="32"
-      writable="false" default="" optional="false">Hostname</attribute>
+    <!-- Attributes from Mode Base -->
+    <attribute side="server" code="0x0000" name="SupportedModes" define="SUPPORTED_MODES" type="array" entryType="ModeOptionStruct" length="255">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="CurrentMode" define="CURRENT_MODE" type="int8u" writable="false" reportable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0002" name="StartUpMode" define="START_UP_MODE" type="int8u" writable="true" isNullable="true">
+      <optionalConform/>
+    </attribute>
+
+    <!-- Commands from Mode Base -->
+    <command source="client" code="0x00" name="ChangeToMode" response="ChangeToModeResponse" optional="false">
+      <description>
+        Change the hardware load type. On receipt of this command the device SHALL respond with a ChangeToModeResponse command.
+      </description>
+      <arg name="NewMode" type="int8u" optional="false"/>
+      <mandatoryConform/>
+    </command>
+
+    <command source="server" code="0x01" name="ChangeToModeResponse" disableDefaultResponse="true" optional="false">
+      <description>
+        Response to ChangeToMode command.
+      </description>
+      <arg name="Status" type="enum8" optional="false"/>
+      <arg name="StatusText" type="char_string" length="64" optional="true"/>
+      <mandatoryConform/>
+    </command>
+  </cluster>
+  
+  
+  <enum name="ModeTag" type="enum16">
+    <cluster code="0xFFF2FC06"/>
+    <!-- Lowpan Proxy Mode tags (0x8000+ for manufacturer-specific) -->
+    <item value="0x8000" name="None"/>
+    <item value="0x8001" name="Light"/>
+    <item value="0x8002" name="Group"/>
+    <item value="0x8003" name="Switch"/>
+  </enum>
+
+  <cluster>
+    <domain>Lowpan</domain>
+    <name>Lowpan Proxy Mode</name>
+    <code>0xFFF2FC06</code>
+    <define>LOWPAN_PROXY_MODE_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>Lowpan proxy mode selection for smartswitch endpoints. Controls how the switch proxies commands to bound devices.</description>
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
+
+    <!-- Attributes from Mode Base -->
+    <attribute side="server" code="0x0000" name="SupportedModes" define="SUPPORTED_MODES" type="array" entryType="ModeOptionStruct" length="255">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="CurrentMode" define="CURRENT_MODE" type="int8u" writable="false" reportable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0002" name="StartUpMode" define="START_UP_MODE" type="int8u" writable="true" isNullable="true">
+      <optionalConform/>
+    </attribute>
+
+    <!-- Commands from Mode Base -->
+    <command source="client" code="0x00" name="ChangeToMode" response="ChangeToModeResponse" optional="false">
+      <description>
+        Change the proxy mode. On receipt of this command the device SHALL respond with a ChangeToModeResponse command.
+      </description>
+      <arg name="NewMode" type="int8u" optional="false"/>
+      <mandatoryConform/>
+    </command>
+
+    <command source="server" code="0x01" name="ChangeToModeResponse" disableDefaultResponse="true" optional="false">
+      <description>
+        Response to ChangeToMode command.
+      </description>
+      <arg name="Status" type="enum8" optional="false"/>
+      <arg name="StatusText" type="char_string" length="64" optional="true"/>
+      <mandatoryConform/>
+    </command>
   </cluster>
 
   <deviceType>
@@ -126,15 +168,9 @@
     <deviceId editable="false">0xFFF28001</deviceId>
     <scope>Endpoint</scope>
     <clusters lockOthers="false">
-      <include cluster="Mode Select" client="false" server="true" clientLocked="false"
+      <include cluster="Lowpan Hardware Mode" client="false" server="true" clientLocked="false"
         serverLocked="true"></include>
       <include cluster="Lowpan BLE Sensor" client="false" server="true" clientLocked="false"
-        serverLocked="true"></include>
-      <include cluster="Lowpan Group" client="false" server="true" clientLocked="false"
-        serverLocked="true"></include>
-      <include cluster="Lowpan Location" client="false" server="true" clientLocked="false"
-        serverLocked="true"></include>
-      <include cluster="Lowpan Web Server" client="false" server="true" clientLocked="false"
         serverLocked="true"></include>
     </clusters>
   </deviceType>
@@ -197,7 +233,7 @@
       </include>
       <include cluster="Power Source" client="false" server="true" clientLocked="true"
         serverLocked="true"></include>
-      <include cluster="Mode Select" client="false" server="true" clientLocked="false"
+      <include cluster="Lowpan Proxy Mode" client="false" server="true" clientLocked="false"
         serverLocked="true"></include>
       <include cluster="Switch" client="false" server="true" clientLocked="true" serverLocked="true"></include>
       <include cluster="Fixed Label" client="false" server="true" clientLocked="true"
