@@ -36,6 +36,8 @@ Each of these enum values is also listed/copied in the derived clusters.
     <cluster code="0x009D"/> <!-- Energy EVSE Mode -->
     <cluster code="0x009E"/> <!-- Water Heater Mode -->
     <cluster code="0x009F"/> <!-- Device Energy Management Mode -->
+    <cluster code="0xFFF2FC05"/> <!-- Lowpan Hardware Mode -->
+    <cluster code="0xFFF2FC06"/> <!-- Lowpan Proxy Mode -->
     <!-- MfgCode has been deprecated -->
     <item name="MfgCode" type="vendor_id" optional="true"/>
     <item name="Value"   type="enum16"    optional="false"/>
@@ -52,6 +54,8 @@ Each of these enum values is also listed/copied in the derived clusters.
     <cluster code="0x009D"/> <!-- Energy EVSE Mode -->
     <cluster code="0x009E"/> <!-- Water Heater Mode -->
     <cluster code="0x009F"/> <!-- Device Energy Management Mode -->
+    <cluster code="0xFFF2FC05"/> <!-- Lowpan Hardware Mode -->
+    <cluster code="0xFFF2FC06"/> <!-- Lowpan Proxy Mode -->
     <item name="Label"    type="char_string"                length="64" optional="false"/>
     <item name="Mode"     type="int8u"                                  optional="false"/>
     <item name="ModeTags" type="ModeTagStruct" array="true" length="8"  optional="false"/>
