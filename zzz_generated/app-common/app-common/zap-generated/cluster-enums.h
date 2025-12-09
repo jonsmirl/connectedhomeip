@@ -92,9 +92,9 @@
 #include <clusters/LocalizationConfiguration/Enums.h>
 #include <clusters/LowPower/Enums.h>
 #include <clusters/LowpanBleSensor/Enums.h>
-#include <clusters/LowpanGroup/Enums.h>
+#include <clusters/LowpanHardwareMode/Enums.h>
 #include <clusters/LowpanLocation/Enums.h>
-#include <clusters/LowpanWebServer/Enums.h>
+#include <clusters/LowpanProxyMode/Enums.h>
 #include <clusters/MediaInput/Enums.h>
 #include <clusters/MediaPlayback/Enums.h>
 #include <clusters/Messages/Enums.h>

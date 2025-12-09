@@ -90,9 +90,9 @@
 #include <clusters/LocalizationConfiguration/AttributeIds.h>
 #include <clusters/LowPower/AttributeIds.h>
 #include <clusters/LowpanBleSensor/AttributeIds.h>
-#include <clusters/LowpanGroup/AttributeIds.h>
+#include <clusters/LowpanHardwareMode/AttributeIds.h>
 #include <clusters/LowpanLocation/AttributeIds.h>
-#include <clusters/LowpanWebServer/AttributeIds.h>
+#include <clusters/LowpanProxyMode/AttributeIds.h>
 #include <clusters/MediaInput/AttributeIds.h>
 #include <clusters/MediaPlayback/AttributeIds.h>
 #include <clusters/Messages/AttributeIds.h>

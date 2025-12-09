@@ -150,12 +150,12 @@
 #include <clusters/LowPower/MetadataProvider.h>
 #include <clusters/LowpanBleSensor/Ids.h>
 #include <clusters/LowpanBleSensor/MetadataProvider.h>
-#include <clusters/LowpanGroup/Ids.h>
-#include <clusters/LowpanGroup/MetadataProvider.h>
+#include <clusters/LowpanHardwareMode/Ids.h>
+#include <clusters/LowpanHardwareMode/MetadataProvider.h>
 #include <clusters/LowpanLocation/Ids.h>
 #include <clusters/LowpanLocation/MetadataProvider.h>
-#include <clusters/LowpanWebServer/Ids.h>
-#include <clusters/LowpanWebServer/MetadataProvider.h>
+#include <clusters/LowpanProxyMode/Ids.h>
+#include <clusters/LowpanProxyMode/MetadataProvider.h>
 #include <clusters/MediaInput/Ids.h>
 #include <clusters/MediaInput/MetadataProvider.h>
 #include <clusters/MediaPlayback/Ids.h>
@@ -666,20 +666,20 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == LowpanBleSensor::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LowpanBleSensor::Id>::EntryFor(command);
     }
-    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == LowpanGroup::Id) || ...))
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == LowpanHardwareMode::Id) || ...))
     {
-        if (id == LowpanGroup::Id)
-            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LowpanGroup::Id>::EntryFor(command);
+        if (id == LowpanHardwareMode::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LowpanHardwareMode::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == LowpanLocation::Id) || ...))
     {
         if (id == LowpanLocation::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LowpanLocation::Id>::EntryFor(command);
     }
-    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == LowpanWebServer::Id) || ...))
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == LowpanProxyMode::Id) || ...))
     {
-        if (id == LowpanWebServer::Id)
-            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LowpanWebServer::Id>::EntryFor(command);
+        if (id == LowpanProxyMode::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LowpanProxyMode::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == LowPower::Id) || ...))
     {

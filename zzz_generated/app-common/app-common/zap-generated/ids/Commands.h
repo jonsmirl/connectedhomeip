@@ -90,9 +90,9 @@
 #include <clusters/LocalizationConfiguration/CommandIds.h>
 #include <clusters/LowPower/CommandIds.h>
 #include <clusters/LowpanBleSensor/CommandIds.h>
-#include <clusters/LowpanGroup/CommandIds.h>
+#include <clusters/LowpanHardwareMode/CommandIds.h>
 #include <clusters/LowpanLocation/CommandIds.h>
-#include <clusters/LowpanWebServer/CommandIds.h>
+#include <clusters/LowpanProxyMode/CommandIds.h>
 #include <clusters/MediaInput/CommandIds.h>
 #include <clusters/MediaPlayback/CommandIds.h>
 #include <clusters/Messages/CommandIds.h>

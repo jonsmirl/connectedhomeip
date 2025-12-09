@@ -90,9 +90,9 @@
 #include <clusters/LocalizationConfiguration/EventIds.h>
 #include <clusters/LowPower/EventIds.h>
 #include <clusters/LowpanBleSensor/EventIds.h>
-#include <clusters/LowpanGroup/EventIds.h>
+#include <clusters/LowpanHardwareMode/EventIds.h>
 #include <clusters/LowpanLocation/EventIds.h>
-#include <clusters/LowpanWebServer/EventIds.h>
+#include <clusters/LowpanProxyMode/EventIds.h>
 #include <clusters/MediaInput/EventIds.h>
 #include <clusters/MediaPlayback/EventIds.h>
 #include <clusters/Messages/EventIds.h>

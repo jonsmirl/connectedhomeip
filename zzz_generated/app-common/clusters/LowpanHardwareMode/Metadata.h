@@ -1,0 +1,58 @@
+// DO NOT EDIT MANUALLY - Generated file
+//
+// Cluster metadata information for cluster LowpanHardwareMode (cluster code: 4294114309/0xFFF2FC05)
+// based on src/controller/data_model/controller-clusters.matter
+#pragma once
+
+#include <app/data-model-provider/MetadataTypes.h>
+#include <array>
+#include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/LowpanHardwareMode/Ids.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace LowpanHardwareMode {
+
+inline constexpr uint32_t kRevision = 1;
+
+namespace Attributes {
+
+namespace SupportedModes {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SupportedModes::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace SupportedModes
+namespace CurrentMode {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace CurrentMode
+namespace StartUpMode {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(StartUpMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
+} // namespace StartUpMode
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    SupportedModes::kMetadataEntry,
+    CurrentMode::kMetadataEntry,
+
+};
+
+} // namespace Attributes
+
+namespace Commands {
+
+namespace ChangeToMode {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ChangeToMode::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kOperate);
+} // namespace ChangeToMode
+
+} // namespace Commands
+
+namespace Events {} // namespace Events
+} // namespace LowpanHardwareMode
+} // namespace Clusters
+} // namespace app
+} // namespace chip

@@ -1457,16 +1457,6 @@ void emberAfSampleMeiClusterShutdownCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfLowpanGroupClusterInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void emberAfLowpanGroupClusterShutdownCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
 void emberAfLowpanLocationClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -1487,12 +1477,22 @@ void emberAfLowpanBleSensorClusterShutdownCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfLowpanWebServerClusterInitCallback(chip::EndpointId endpoint);
+void emberAfLowpanHardwareModeClusterInitCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being shutdown
  */
-void emberAfLowpanWebServerClusterShutdownCallback(chip::EndpointId endpoint);
+void emberAfLowpanHardwareModeClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfLowpanProxyModeClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfLowpanProxyModeClusterShutdownCallback(chip::EndpointId endpoint);
 
 // Cluster Server/Client Init Functions
 
@@ -6982,45 +6982,6 @@ MatterSampleMeiClusterServerPreAttributeChangedCallback(const chip::app::Concret
 void emberAfSampleMeiClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
-// Lowpan Group Cluster
-//
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfLowpanGroupClusterServerInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterLowpanGroupClusterServerShutdownCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfLowpanGroupClusterClientInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param attributePath Concrete attribute path that changed
- */
-void MatterLowpanGroupClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/**
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status
-MatterLowpanGroupClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/**
- * @param endpoint  Endpoint that is being served
- */
-void emberAfLowpanGroupClusterServerTickCallback(chip::EndpointId endpoint);
-
-//
 // Lowpan Location Cluster
 //
 
@@ -7099,28 +7060,66 @@ MatterLowpanBleSensorClusterServerPreAttributeChangedCallback(const chip::app::C
 void emberAfLowpanBleSensorClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
-// Lowpan Web Server Cluster
+// Lowpan Hardware Mode Cluster
 //
 
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfLowpanWebServerClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfLowpanHardwareModeClusterServerInitCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being shutdown
  */
-void MatterLowpanWebServerClusterServerShutdownCallback(chip::EndpointId endpoint);
+void MatterLowpanHardwareModeClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfLowpanWebServerClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfLowpanHardwareModeClusterClientInitCallback(chip::EndpointId endpoint);
 
 /**
  * @param attributePath Concrete attribute path that changed
  */
-void MatterLowpanWebServerClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterLowpanHardwareModeClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterLowpanHardwareModeClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfLowpanHardwareModeClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
+// Lowpan Proxy Mode Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfLowpanProxyModeClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterLowpanProxyModeClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfLowpanProxyModeClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterLowpanProxyModeClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /**
  * @param attributePath Concrete attribute path to be changed
@@ -7129,13 +7128,13 @@ void MatterLowpanWebServerClusterServerAttributeChangedCallback(const chip::app:
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-MatterLowpanWebServerClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+MatterLowpanProxyModeClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /**
  * @param endpoint  Endpoint that is being served
  */
-void emberAfLowpanWebServerClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfLowpanProxyModeClusterServerTickCallback(chip::EndpointId endpoint);
 
 // Cluster Commands Callback
 
@@ -8388,24 +8387,6 @@ bool emberAfFaultInjectionClusterFailRandomlyAtFaultCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::FaultInjection::Commands::FailRandomlyAtFault::DecodableType & commandData);
 /**
- * @brief Lowpan Group Cluster AddGroupEp Command callback (from client)
- */
-bool emberAfLowpanGroupClusterAddGroupEpCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::LowpanGroup::Commands::AddGroupEp::DecodableType & commandData);
-/**
- * @brief Lowpan Group Cluster RemoveGroupEp Command callback (from client)
- */
-bool emberAfLowpanGroupClusterRemoveGroupEpCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::LowpanGroup::Commands::RemoveGroupEp::DecodableType & commandData);
-/**
- * @brief Lowpan Group Cluster Configuration Command callback (from client)
- */
-bool emberAfLowpanGroupClusterConfigurationCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::LowpanGroup::Commands::Configuration::DecodableType & commandData);
-/**
  * @brief Lowpan BLE Sensor Cluster AddSensorEp Command callback (from client)
  */
 bool emberAfLowpanBleSensorClusterAddSensorEpCallback(
@@ -8417,3 +8398,15 @@ bool emberAfLowpanBleSensorClusterAddSensorEpCallback(
 bool emberAfLowpanBleSensorClusterRemoveSensorEpCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::LowpanBleSensor::Commands::RemoveSensorEp::DecodableType & commandData);
+/**
+ * @brief Lowpan Hardware Mode Cluster ChangeToMode Command callback (from client)
+ */
+bool emberAfLowpanHardwareModeClusterChangeToModeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::LowpanHardwareMode::Commands::ChangeToMode::DecodableType & commandData);
+/**
+ * @brief Lowpan Proxy Mode Cluster ChangeToMode Command callback (from client)
+ */
+bool emberAfLowpanProxyModeClusterChangeToModeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::LowpanProxyMode::Commands::ChangeToMode::DecodableType & commandData);
