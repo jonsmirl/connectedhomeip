@@ -57,6 +57,10 @@
       default="0" optional="false">Longitude</attribute>
     <attribute side="server" code="0x0002" define="TIMEZONE" type="char_string" length="100"
       writable="false" default="" optional="false">Timezone</attribute>
+    <attribute side="server" code="0x0003" define="LOCALITY" type="char_string" length="100"
+      writable="false" default="" optional="false">Locality</attribute>
+    <attribute side="server" code="0x0004" define="CITY" type="char_string" length="100"
+      writable="false" default="" optional="false">City</attribute>
   </cluster>
 
   <enum name="ModeTag" type="enum16">
@@ -171,6 +175,8 @@
       <include cluster="Lowpan Hardware Mode" client="false" server="true" clientLocked="false"
         serverLocked="true"></include>
       <include cluster="Lowpan BLE Sensor" client="false" server="true" clientLocked="false"
+        serverLocked="true"></include>
+      <include cluster="Lowpan Location" client="false" server="true" clientLocked="false"
         serverLocked="true"></include>
     </clusters>
   </deviceType>
