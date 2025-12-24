@@ -76,6 +76,10 @@ CHIP_ERROR LowpanWebServerAttrAccess::Read(const app::ConcreteReadAttributePath 
         ChipLogProgress(Zcl, "LowpanWebServer: JWT attribute read, token length %u", (unsigned)tokenLen);
         return aEncoder.Encode(CharSpan(tokenBuffer, tokenLen));
     }
+    case Attributes::FeatureMap::Id:
+        return aEncoder.Encode(static_cast<uint32_t>(0));
+    case Attributes::ClusterRevision::Id:
+        return aEncoder.Encode(static_cast<uint16_t>(1));
     default:
         break;
     }
