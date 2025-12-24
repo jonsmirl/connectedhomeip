@@ -1494,6 +1494,16 @@ void emberAfLowpanProxyModeClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfLowpanProxyModeClusterShutdownCallback(chip::EndpointId endpoint);
 
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfLowpanWebServerClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfLowpanWebServerClusterShutdownCallback(chip::EndpointId endpoint);
+
 // Cluster Server/Client Init Functions
 
 //
@@ -7135,6 +7145,45 @@ MatterLowpanProxyModeClusterServerPreAttributeChangedCallback(const chip::app::C
  * @param endpoint  Endpoint that is being served
  */
 void emberAfLowpanProxyModeClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
+// Lowpan Web Server Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfLowpanWebServerClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterLowpanWebServerClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfLowpanWebServerClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterLowpanWebServerClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterLowpanWebServerClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                              EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfLowpanWebServerClusterServerTickCallback(chip::EndpointId endpoint);
 
 // Cluster Commands Callback
 

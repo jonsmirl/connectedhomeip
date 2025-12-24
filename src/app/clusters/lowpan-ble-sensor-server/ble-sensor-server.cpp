@@ -23,6 +23,18 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <tracing/macros.h>
 
+// External implementation in LowpanBleSensor.cpp
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace LowpanBleSensor {
+extern CHIP_ERROR AddSensorEp(const char * macAddress);
+extern CHIP_ERROR RemoveSensorEp(EndpointId endpointId);
+} // namespace LowpanBleSensor
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -33,16 +45,24 @@ bool emberAfLowpanBleSensorClusterAddSensorEpCallback(app::CommandHandler * comm
 {
     MATTER_TRACE_SCOPE("AddSensorEp", "LowpanBleSensor");
 
-    ChipLogProgress(Zcl, "LowpanBleSensor: AddSensorEp command received on endpoint %u (stub implementation)",
-                    commandPath.mEndpointId);
+    ChipLogProgress(Zcl, "LowpanBleSensor: AddSensorEp command received on endpoint %u", commandPath.mEndpointId);
 
-    // TODO: Implement BLE sensor endpoint addition logic
-    // This would typically:
-    // 1. Validate the sensor parameters
-    // 2. Create a dynamic endpoint for the sensor
-    // 3. Configure the sensor attributes
+    // Extract MAC address
+    CharSpan macSpan = commandData.macAddress;
+    char mac[18] = {0};
+    size_t len = (macSpan.size() < sizeof(mac) - 1) ? macSpan.size() : sizeof(mac) - 1;
+    memcpy(mac, macSpan.data(), len);
+    mac[len] = '\0';
 
-    commandObj->AddStatus(commandPath, Status::Success);
+    CHIP_ERROR err = LowpanBleSensor::AddSensorEp(mac);
+    if (err == CHIP_NO_ERROR)
+    {
+        commandObj->AddStatus(commandPath, Status::Success);
+    }
+    else
+    {
+        commandObj->AddStatus(commandPath, Status::Failure);
+    }
     return true;
 }
 
@@ -51,16 +71,22 @@ bool emberAfLowpanBleSensorClusterRemoveSensorEpCallback(app::CommandHandler * c
 {
     MATTER_TRACE_SCOPE("RemoveSensorEp", "LowpanBleSensor");
 
-    ChipLogProgress(Zcl, "LowpanBleSensor: RemoveSensorEp command received on endpoint %u (stub implementation)",
-                    commandPath.mEndpointId);
+    ChipLogProgress(Zcl, "LowpanBleSensor: RemoveSensorEp command received on endpoint %u", commandPath.mEndpointId);
 
-    // TODO: Implement BLE sensor endpoint removal logic
-    // This would typically:
-    // 1. Validate the sensor endpoint ID
-    // 2. Remove the dynamic endpoint
-    // 3. Clean up associated resources
-
-    commandObj->AddStatus(commandPath, Status::Success);
+    EndpointId epId = static_cast<EndpointId>(commandData.endpoint);
+    CHIP_ERROR err = LowpanBleSensor::RemoveSensorEp(epId);
+    if (err == CHIP_NO_ERROR)
+    {
+        commandObj->AddStatus(commandPath, Status::Success);
+    }
+    else if (err == CHIP_ERROR_NOT_FOUND)
+    {
+        commandObj->AddStatus(commandPath, Status::NotFound);
+    }
+    else
+    {
+        commandObj->AddStatus(commandPath, Status::Failure);
+    }
     return true;
 }
 

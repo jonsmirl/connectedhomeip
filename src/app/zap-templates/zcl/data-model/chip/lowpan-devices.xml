@@ -164,6 +164,22 @@
     </command>
   </cluster>
 
+  <cluster>
+    <domain>Lowpan</domain>
+    <name>Lowpan Web Server</name>
+    <code>0xFFF2FC04</code>
+    <define>LOWPAN_WEB_SERVER_CLUSTER</define>
+    <description>The Web Server cluster provides JWT-based authentication for secure HTTP API access.
+      The web server is always enabled and accessible via IP address.</description>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <globalAttribute code="0xFFFD" side="either" value="1" />
+
+    <!-- Attributes -->
+    <attribute side="server" code="0x0000" define="JWT" type="char_string" length="256"
+      writable="false" default="" optional="false">Jwt</attribute>
+  </cluster>
+
   <deviceType>
     <name>Lowpan Main</name>
     <domain>CHIP</domain>
@@ -177,6 +193,8 @@
       <include cluster="Lowpan BLE Sensor" client="false" server="true" clientLocked="false"
         serverLocked="true"></include>
       <include cluster="Lowpan Location" client="false" server="true" clientLocked="false"
+        serverLocked="true"></include>
+      <include cluster="Lowpan Web Server" client="false" server="true" clientLocked="false"
         serverLocked="true"></include>
     </clusters>
   </deviceType>

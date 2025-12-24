@@ -369,6 +369,8 @@
         "ZONE_MANAGEMENT_CLUSTER": ["zone-management-server"],
         "LOWPAN_BLE_SENSOR_CLUSTER": ["lowpan-ble-sensor-server"],
         "LOWPAN_PROXY_MODE_CLUSTER": ["mode-base-server"],
-        "LOWPAN_HARDWARE_MODE_CLUSTER": ["mode-base-server"]
+        "LOWPAN_HARDWARE_MODE_CLUSTER": ["mode-base-server"],
+        "LOWPAN_LOCATION_CLUSTER": ["lowpan-location-server"],
+        "LOWPAN_WEB_SERVER_CLUSTER": ["lowpan-web-server"]
     }
 }

@@ -43,19 +43,7 @@ namespace Clusters {
 namespace LowpanWebServer {
 namespace Attributes {
 
-namespace Enable {
-struct TypeInfo
-{
-    using Type             = bool;
-    using DecodableType    = bool;
-    using DecodableArgType = bool;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::LowpanWebServer::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Enable::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace Enable
-namespace Hostname {
+namespace Jwt {
 struct TypeInfo
 {
     using Type             = chip::CharSpan;
@@ -63,11 +51,11 @@ struct TypeInfo
     using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LowpanWebServer::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Hostname::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Jwt::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 32; }
+    static constexpr size_t MaxLength() { return 256; }
 };
-} // namespace Hostname
+} // namespace Jwt
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -107,8 +95,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Enable::TypeInfo::DecodableType enable = static_cast<bool>(0);
-        Attributes::Hostname::TypeInfo::DecodableType hostname;
+        Attributes::Jwt::TypeInfo::DecodableType jwt;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

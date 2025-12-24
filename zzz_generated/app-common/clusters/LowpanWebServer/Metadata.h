@@ -21,17 +21,12 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
-namespace Enable {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Enable::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+namespace Jwt {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(Jwt::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
-} // namespace Enable
-namespace Hostname {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Hostname::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
-} // namespace Hostname
-constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
-    Enable::kMetadataEntry,
-    Hostname::kMetadataEntry,
+} // namespace Jwt
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+    Jwt::kMetadataEntry,
 
 };
 

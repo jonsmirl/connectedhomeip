@@ -23,10 +23,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::LowpanWebSer
         using namespace Clusters::LowpanWebServer::Attributes;
         switch (attributeId)
         {
-        case Enable::Id:
-            return Enable::kMetadataEntry;
-        case Hostname::Id:
-            return Hostname::kMetadataEntry;
+        case Jwt::Id:
+            return Jwt::kMetadataEntry;
         default:
             return std::nullopt;
         }

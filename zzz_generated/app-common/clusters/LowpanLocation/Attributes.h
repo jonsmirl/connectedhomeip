@@ -80,6 +80,32 @@ struct TypeInfo
     static constexpr size_t MaxLength() { return 100; }
 };
 } // namespace Timezone
+namespace Locality {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LowpanLocation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Locality::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 100; }
+};
+} // namespace Locality
+namespace City {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LowpanLocation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::City::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 100; }
+};
+} // namespace City
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -122,6 +148,8 @@ struct TypeInfo
         Attributes::Latitude::TypeInfo::DecodableType latitude   = static_cast<int32_t>(0);
         Attributes::Longitude::TypeInfo::DecodableType longitude = static_cast<int32_t>(0);
         Attributes::Timezone::TypeInfo::DecodableType timezone;
+        Attributes::Locality::TypeInfo::DecodableType locality;
+        Attributes::City::TypeInfo::DecodableType city;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

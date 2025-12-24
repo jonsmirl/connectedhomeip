@@ -315,6 +315,10 @@
 #include <clusters/LowpanProxyMode/Commands.h>
 #include <clusters/LowpanProxyMode/Events.h>
 #include <clusters/LowpanProxyMode/Structs.h>
+#include <clusters/LowpanWebServer/Attributes.h>
+#include <clusters/LowpanWebServer/Commands.h>
+#include <clusters/LowpanWebServer/Events.h>
+#include <clusters/LowpanWebServer/Structs.h>
 #include <clusters/MediaInput/Attributes.h>
 #include <clusters/MediaInput/Commands.h>
 #include <clusters/MediaInput/Events.h>

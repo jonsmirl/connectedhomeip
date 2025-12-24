@@ -315,6 +315,10 @@
 #include <clusters/LowpanProxyMode/Commands.ipp>
 #include <clusters/LowpanProxyMode/Events.ipp>
 #include <clusters/LowpanProxyMode/Structs.ipp>
+#include <clusters/LowpanWebServer/Attributes.ipp>
+#include <clusters/LowpanWebServer/Commands.ipp>
+#include <clusters/LowpanWebServer/Events.ipp>
+#include <clusters/LowpanWebServer/Structs.ipp>
 #include <clusters/MediaInput/Attributes.ipp>
 #include <clusters/MediaInput/Commands.ipp>
 #include <clusters/MediaInput/Events.ipp>

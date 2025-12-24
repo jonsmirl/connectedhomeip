@@ -14,7 +14,7 @@ namespace LowpanLocation {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 8;
+inline constexpr uint32_t kAttributesCount = 10;
 
 namespace Latitude {
 inline constexpr AttributeId Id = 0x00000000;
@@ -27,6 +27,14 @@ inline constexpr AttributeId Id = 0x00000001;
 namespace Timezone {
 inline constexpr AttributeId Id = 0x00000002;
 } // namespace Timezone
+
+namespace Locality {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace Locality
+
+namespace City {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace City
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

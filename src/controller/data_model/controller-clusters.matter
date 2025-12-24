@@ -12283,14 +12283,12 @@ cluster LowpanBleSensor = 4294114307 {
   command RemoveSensorEp(RemoveSensorEpRequest): DefaultSuccess = 1;
 }
 
-/** The Web Server cluster provides facilities to configure and control an embedded web
-      server including enable/disable functionality and hostname configuration with automatic mDNS
-      registration. */
+/** The Web Server cluster provides JWT-based authentication for secure HTTP API access.
+      The web server is always enabled and accessible via IP address. */
 cluster LowpanWebServer = 4294114308 {
   revision 1;
 
-  readonly attribute boolean enable = 0;
-  readonly attribute char_string<32> hostname = 1;
+  readonly attribute char_string<256> jwt = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;

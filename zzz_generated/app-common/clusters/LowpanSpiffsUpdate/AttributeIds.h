@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster LowpanWebServer (cluster code: 4294114308/0xFFF2FC04)
+// Identifier constant values for cluster LowpanSpiffsUpdate (cluster code: 4294114311/0xFFF2FC07)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 
@@ -10,15 +10,35 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace LowpanWebServer {
+namespace LowpanSpiffsUpdate {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 6;
+inline constexpr uint32_t kAttributesCount = 10;
 
-namespace Jwt {
+namespace CurrentVersion {
 inline constexpr AttributeId Id = 0x00000000;
-} // namespace Jwt
+} // namespace CurrentVersion
+
+namespace LastCheckTime {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace LastCheckTime
+
+namespace UpdateStatus {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace UpdateStatus
+
+namespace ErrorCode {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace ErrorCode
+
+namespace DownloadProgress {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace DownloadProgress
+
+namespace Initialized {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace Initialized
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -41,7 +61,7 @@ inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace LowpanWebServer
+} // namespace LowpanSpiffsUpdate
 } // namespace Clusters
 } // namespace app
 } // namespace chip
