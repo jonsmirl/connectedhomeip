@@ -21,6 +21,15 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
 
+// Include Lowpan custom clusters
+#include <clusters/LowpanLocation/ClusterId.h>
+#include <clusters/LowpanLocation/AttributeIds.h>
+#include <clusters/LowpanBleSensor/ClusterId.h>
+#include <clusters/LowpanBleSensor/AttributeIds.h>
+#include <clusters/LowpanBleSensor/CommandIds.h>
+#include <clusters/LowpanWebServer/ClusterId.h>
+#include <clusters/LowpanWebServer/AttributeIds.h>
+
 char const * ClusterIdToText(chip::ClusterId id)
 {
     switch (id)
@@ -309,8 +318,6 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "FaultInjection";
     case chip::app::Clusters::SampleMei::Id:
         return "SampleMei";
-    case chip::app::Clusters::LowpanGroup::Id:
-        return "LowpanGroup";
     case chip::app::Clusters::LowpanLocation::Id:
         return "LowpanLocation";
     case chip::app::Clusters::LowpanBleSensor::Id:
@@ -5092,23 +5099,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
-    case chip::app::Clusters::LowpanGroup::Id: {
-        switch (id)
-        {
-        case chip::app::Clusters::LowpanGroup::Attributes::GeneratedCommandList::Id:
-            return "GeneratedCommandList";
-        case chip::app::Clusters::LowpanGroup::Attributes::AcceptedCommandList::Id:
-            return "AcceptedCommandList";
-        case chip::app::Clusters::LowpanGroup::Attributes::AttributeList::Id:
-            return "AttributeList";
-        case chip::app::Clusters::LowpanGroup::Attributes::FeatureMap::Id:
-            return "FeatureMap";
-        case chip::app::Clusters::LowpanGroup::Attributes::ClusterRevision::Id:
-            return "ClusterRevision";
-        default:
-            return "Unknown";
-        }
-    }
     case chip::app::Clusters::LowpanLocation::Id: {
         switch (id)
         {
@@ -5154,10 +5144,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::LowpanWebServer::Id: {
         switch (id)
         {
-        case chip::app::Clusters::LowpanWebServer::Attributes::Enable::Id:
-            return "Enable";
-        case chip::app::Clusters::LowpanWebServer::Attributes::Hostname::Id:
-            return "Hostname";
+        case chip::app::Clusters::LowpanWebServer::Attributes::Jwt::Id:
+            return "Jwt";
         case chip::app::Clusters::LowpanWebServer::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::LowpanWebServer::Attributes::AcceptedCommandList::Id:
@@ -6609,19 +6597,6 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Ping";
         case chip::app::Clusters::SampleMei::Commands::AddArguments::Id:
             return "AddArguments";
-        default:
-            return "Unknown";
-        }
-    }
-    case chip::app::Clusters::LowpanGroup::Id: {
-        switch (id)
-        {
-        case chip::app::Clusters::LowpanGroup::Commands::AddGroupEp::Id:
-            return "AddGroupEp";
-        case chip::app::Clusters::LowpanGroup::Commands::RemoveGroupEp::Id:
-            return "RemoveGroupEp";
-        case chip::app::Clusters::LowpanGroup::Commands::Configuration::Id:
-            return "Configuration";
         default:
             return "Unknown";
         }

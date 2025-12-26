@@ -26,6 +26,16 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
+
+// Include Lowpan custom clusters
+#include <clusters/LowpanLocation/Ids.h>
+#include <clusters/LowpanLocation/Attributes.h>
+#include <clusters/LowpanBleSensor/Ids.h>
+#include <clusters/LowpanBleSensor/Attributes.h>
+#include <clusters/LowpanBleSensor/Commands.h>
+#include <clusters/LowpanWebServer/Ids.h>
+#include <clusters/LowpanWebServer/Attributes.h>
+
 #include <commands/clusters/ClusterCommand.h>
 #include <commands/clusters/ComplexArgument.h>
 #include <commands/clusters/ReportCommand.h>
@@ -177,7 +187,6 @@
 | UnitTesting                                                         | 0xFFF1FC05|
 | FaultInjection                                                      | 0xFFF1FC06|
 | SampleMei                                                           | 0xFFF1FC20|
-| LowpanGroup                                                         | 0xFFF2FC01|
 | LowpanLocation                                                      | 0xFFF2FC02|
 | LowpanBleSensor                                                     | 0xFFF2FC03|
 | LowpanWebServer                                                     | 0xFFF2FC04|
@@ -19426,135 +19435,6 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster LowpanGroup                                                 | 0xFFF2FC01 |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-| * AddGroupEp                                                        |   0x00 |
-| * RemoveGroupEp                                                     |   0x01 |
-| * Configuration                                                     |   0x02 |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * GeneratedCommandList                                              | 0xFFF8 |
-| * AcceptedCommandList                                               | 0xFFF9 |
-| * AttributeList                                                     | 0xFFFB |
-| * FeatureMap                                                        | 0xFFFC |
-| * ClusterRevision                                                   | 0xFFFD |
-|------------------------------------------------------------------------------|
-| Events:                                                             |        |
-\*----------------------------------------------------------------------------*/
-
-/*
- * Command AddGroupEp
- */
-class LowpanGroupAddGroupEp : public ClusterCommand
-{
-public:
-    LowpanGroupAddGroupEp(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("add-group-ep", credsIssuerConfig)
-    {
-        AddArgument("Endpoint", 0, UINT16_MAX, &mRequest.endpoint);
-        AddArgument("GroupName", &mRequest.groupName);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::LowpanGroup::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::LowpanGroup::Commands::AddGroupEp::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::LowpanGroup::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::LowpanGroup::Commands::AddGroupEp::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::LowpanGroup::Commands::AddGroupEp::Type mRequest;
-};
-
-/*
- * Command RemoveGroupEp
- */
-class LowpanGroupRemoveGroupEp : public ClusterCommand
-{
-public:
-    LowpanGroupRemoveGroupEp(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("remove-group-ep", credsIssuerConfig)
-    {
-        AddArgument("Endpoint", 0, UINT16_MAX, &mRequest.endpoint);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::LowpanGroup::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::LowpanGroup::Commands::RemoveGroupEp::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::LowpanGroup::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::LowpanGroup::Commands::RemoveGroupEp::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::LowpanGroup::Commands::RemoveGroupEp::Type mRequest;
-};
-
-/*
- * Command Configuration
- */
-class LowpanGroupConfiguration : public ClusterCommand
-{
-public:
-    LowpanGroupConfiguration(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("configuration", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::LowpanGroup::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::LowpanGroup::Commands::Configuration::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::LowpanGroup::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::LowpanGroup::Commands::Configuration::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::LowpanGroup::Commands::Configuration::Type mRequest;
-};
-
-/*----------------------------------------------------------------------------*\
 | Cluster LowpanLocation                                              | 0xFFF2FC02 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -32718,56 +32598,6 @@ void registerClusterSampleMei(Commands & commands, CredentialIssuerCommands * cr
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
-void registerClusterLowpanGroup(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
-{
-    using namespace chip::app::Clusters::LowpanGroup;
-
-    const char * clusterName = "LowpanGroup";
-
-    commands_list clusterCommands = {
-        //
-        // Commands
-        //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),       //
-        make_unique<LowpanGroupAddGroupEp>(credsIssuerConfig),    //
-        make_unique<LowpanGroupRemoveGroupEp>(credsIssuerConfig), //
-        make_unique<LowpanGroupConfiguration>(credsIssuerConfig), //
-        //
-        // Attributes
-        //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
-        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
-            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
-            credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
-            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
-            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
-        //
-        // Events
-        //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
-    };
-
-    commands.RegisterCluster(clusterName, clusterCommands);
-}
 void registerClusterLowpanLocation(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::LowpanLocation;
@@ -32896,17 +32726,14 @@ void registerClusterLowpanWebServer(Commands & commands, CredentialIssuerCommand
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "enable", Attributes::Enable::Id, credsIssuerConfig),                               //
-        make_unique<ReadAttribute>(Id, "hostname", Attributes::Hostname::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "jwt", Attributes::Jwt::Id, credsIssuerConfig),                                     //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<bool>>(Id, "enable", 0, 1, Attributes::Enable::Id, WriteCommandType::kForceWrite,
-                                          credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::CharSpan>>(Id, "hostname", Attributes::Hostname::Id, WriteCommandType::kForceWrite,
+        make_unique<WriteAttribute<chip::CharSpan>>(Id, "jwt", Attributes::Jwt::Id, WriteCommandType::kForceWrite,
                                                     credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -32920,8 +32747,7 @@ void registerClusterLowpanWebServer(Commands & commands, CredentialIssuerCommand
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "enable", Attributes::Enable::Id, credsIssuerConfig),                               //
-        make_unique<SubscribeAttribute>(Id, "hostname", Attributes::Hostname::Id, credsIssuerConfig),                           //
+        make_unique<SubscribeAttribute>(Id, "jwt", Attributes::Jwt::Id, credsIssuerConfig),                                     //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -33103,7 +32929,6 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterUnitTesting(commands, credsIssuerConfig);
     registerClusterFaultInjection(commands, credsIssuerConfig);
     registerClusterSampleMei(commands, credsIssuerConfig);
-    registerClusterLowpanGroup(commands, credsIssuerConfig);
     registerClusterLowpanLocation(commands, credsIssuerConfig);
     registerClusterLowpanBleSensor(commands, credsIssuerConfig);
     registerClusterLowpanWebServer(commands, credsIssuerConfig);

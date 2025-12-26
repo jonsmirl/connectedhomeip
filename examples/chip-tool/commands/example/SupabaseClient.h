@@ -79,6 +79,13 @@ public:
     std::string GetSupabaseUrl() const { return mSupabaseUrl; }
     std::string GetAnonKey() const { return mAnonKey; }
 
+    /**
+     * @brief Set the preferred home name to use for certificate retrieval
+     * @param homeName Name of the home to prioritize (e.g., "Florida")
+     */
+    void SetPreferredHomeName(const std::string & homeName) { mPreferredHomeName = homeName; }
+    std::string GetPreferredHomeName() const { return mPreferredHomeName; }
+
     // Expose the ICA keypair used for the CSR so the issuer can sign with the same key
     chip::Crypto::P256Keypair * GetICAKeypairPtr() { return &mICAKeypair; }
 
@@ -88,6 +95,7 @@ public:
 private:
     std::string mSupabaseUrl;
     std::string mAnonKey;
+    std::string mPreferredHomeName = "Florida";  // Default to Florida for backwards compatibility
     bool mInitialized = false;
 
     // HTTP client methods

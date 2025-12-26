@@ -222,6 +222,28 @@
   </deviceType>
 
   <deviceType>
+    <name>Lowpan Screen</name>
+    <domain>CHIP</domain>
+    <typeName>Lowpan Screen</typeName>
+    <profileId editable="false">0x0103</profileId>
+    <deviceId editable="false">0xFFF28008</deviceId>
+    <scope>Endpoint</scope>
+    <clusters lockOthers="false">
+    </clusters>
+  </deviceType>
+
+  <deviceType>
+    <name>Lowpan Thermostat</name>
+    <domain>CHIP</domain>
+    <typeName>Lowpan Thermostat</typeName>
+    <profileId editable="false">0x0103</profileId>
+    <deviceId editable="false">0xFFF28009</deviceId>
+    <scope>Endpoint</scope>
+    <clusters lockOthers="false">
+    </clusters>
+  </deviceType>
+
+  <deviceType>
     <name>Lowpan Proxy</name>
     <domain>CHIP</domain>
     <typeName>Lowpan Proxy</typeName>

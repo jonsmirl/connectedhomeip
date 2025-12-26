@@ -130,12 +130,13 @@ CertificateBundle SupabaseClient::GetCertificates(const std::string & accessToke
         return bundle;
     }
 
-    // Use the first home (or look for "Florida" home)
+    // Use the first home (or look for preferred home by name)
     std::string homeId;
     std::string homeName;
+    ChipLogProgress(AppServer, "Looking for preferred home: %s", mPreferredHomeName.c_str());
     for (const auto & home : homes)
     {
-        if (home.second == "Florida")
+        if (home.second == mPreferredHomeName)
         {
             homeId   = home.first;
             homeName = home.second;
@@ -143,11 +144,12 @@ CertificateBundle SupabaseClient::GetCertificates(const std::string & accessToke
         }
     }
 
-    // If no "Florida" home found, use the first one
+    // If preferred home not found, use the first one
     if (homeId.empty() && !homes.empty())
     {
         homeId   = homes[0].first;
         homeName = homes[0].second;
+        ChipLogProgress(AppServer, "Preferred home '%s' not found, using first home", mPreferredHomeName.c_str());
     }
 
     ChipLogProgress(AppServer, "Using home: %s (ID: %s)", homeName.c_str(), homeId.c_str());

@@ -35,8 +35,10 @@ class SupabaseCredentialIssuerCommands : public CredentialIssuerCommands
 {
 public:
     SupabaseCredentialIssuerCommands(const std::string & supabaseUrl = "https://vmhzoaoyvxfdlubxnudv.supabase.co",
-                                     const std::string & anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtaHpvYW95dnhmZGx1Ynh"
-                                                                   "udWR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAyNzU4NDIsImV4cCI6MjA3NTg1MTg0Mn0.a2NjscBPMR_vxYnIGkiF7txQGP6WESyYATf9YbA1CTc");
+                                     const std::string & anonKey = "sb_publishable_j8m2MH1NyROQk8jjNIB8AQ_5Ppvf5N7",
+                                     const std::string & email = "test@lowpan.com",
+                                     const std::string & password = "testme",
+                                     const std::string & homeName = "Florida");
     ~SupabaseCredentialIssuerCommands();
 
     CHIP_ERROR InitializeCredentialsIssuer(chip::PersistentStorageDelegate & storage) override;
@@ -66,6 +68,9 @@ private:
 
     std::string mSupabaseUrl;
     std::string mAnonKey;
+    std::string mEmail;
+    std::string mPassword;
+    std::string mHomeName;
     std::string mAccessToken;
 
     bool mUsesMaxSizedCerts     = false;

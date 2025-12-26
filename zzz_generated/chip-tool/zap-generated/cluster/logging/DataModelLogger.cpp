@@ -23108,37 +23108,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case LowpanGroup::Id: {
-        switch (path.mAttributeId)
-        {
-        case LowpanGroup::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, LowpanGroup::Id);
-        }
-        case LowpanGroup::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, LowpanGroup::Id);
-        }
-        case LowpanGroup::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogAttributeId("AttributeList", 1, value, LowpanGroup::Id);
-        }
-        case LowpanGroup::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case LowpanGroup::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
     case LowpanLocation::Id: {
         switch (path.mAttributeId)
         {
@@ -23224,15 +23193,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case LowpanWebServer::Id: {
         switch (path.mAttributeId)
         {
-        case LowpanWebServer::Attributes::Enable::Id: {
-            bool value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Enable", 1, value);
-        }
-        case LowpanWebServer::Attributes::Hostname::Id: {
+        case LowpanWebServer::Attributes::Jwt::Id: {
             chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Hostname", 1, value);
+            return DataModelLogger::LogValue("Jwt", 1, value);
         }
         case LowpanWebServer::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

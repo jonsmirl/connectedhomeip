@@ -20,11 +20,34 @@
 #include "SupabaseClient.h"
 
 #include <lib/support/logging/CHIPLogging.h>
+#include <cstdlib>
+
+namespace {
+// Helper to get environment variable with default value
+std::string GetEnvOrDefault(const char * envVar, const std::string & defaultValue)
+{
+    const char * value = std::getenv(envVar);
+    return (value != nullptr) ? std::string(value) : defaultValue;
+}
+} // namespace
 
 SupabaseCredentialIssuerCommands::SupabaseCredentialIssuerCommands(const std::string & supabaseUrl,
-                                                                   const std::string & anonKey) :
-    mDacVerifier(nullptr), mSupabaseUrl(supabaseUrl), mAnonKey(anonKey)
-{}
+                                                                   const std::string & anonKey,
+                                                                   const std::string & email,
+                                                                   const std::string & password,
+                                                                   const std::string & homeName) :
+    mDacVerifier(nullptr),
+    mSupabaseUrl(GetEnvOrDefault("SUPABASE_URL", supabaseUrl)),
+    mAnonKey(GetEnvOrDefault("SUPABASE_ANON_KEY", anonKey)),
+    mEmail(GetEnvOrDefault("SUPABASE_EMAIL", email)),
+    mPassword(GetEnvOrDefault("SUPABASE_PASSWORD", password)),
+    mHomeName(GetEnvOrDefault("SUPABASE_HOME", homeName))
+{
+    ChipLogProgress(chipTool, "Supabase configuration (env overrides defaults):");
+    ChipLogProgress(chipTool, "  SUPABASE_URL: %s", mSupabaseUrl.c_str());
+    ChipLogProgress(chipTool, "  SUPABASE_EMAIL: %s", mEmail.c_str());
+    ChipLogProgress(chipTool, "  SUPABASE_HOME: %s", mHomeName.c_str());
+}
 
 SupabaseCredentialIssuerCommands::~SupabaseCredentialIssuerCommands() {}
 
@@ -53,8 +76,13 @@ CHIP_ERROR SupabaseCredentialIssuerCommands::InitializeSupabaseClient()
     // Initialize the client
     ReturnErrorOnFailure(mSupabaseClient->Initialize(mSupabaseUrl, mAnonKey));
 
+    // Set the preferred home name
+    mSupabaseClient->SetPreferredHomeName(mHomeName);
+    ChipLogProgress(chipTool, "Preferred home: %s", mHomeName.c_str());
+
     // Authenticate with Supabase
-    auto authResult = mSupabaseClient->Authenticate("test@lowpan.com", "testme");
+    ChipLogProgress(chipTool, "Authenticating as: %s", mEmail.c_str());
+    auto authResult = mSupabaseClient->Authenticate(mEmail, mPassword);
     if (!authResult.success)
     {
         ChipLogError(chipTool, "Supabase authentication failed: %s", authResult.errorMessage.c_str());

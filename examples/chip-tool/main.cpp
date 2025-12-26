@@ -18,6 +18,7 @@
 
 #include "commands/common/Commands.h"
 #include "commands/example/ExampleCredentialIssuerCommands.h"
+#include "commands/example/SupabaseCredentialIssuerCommands.h"
 
 #include "commands/clusters/SubscriptionsCommands.h"
 #include "commands/dcl/Commands.h"
@@ -38,7 +39,9 @@
 // ================================================================================
 int main(int argc, char * argv[])
 {
-    ExampleCredentialIssuerCommands credIssuerCommands;
+    // Use Supabase credential issuer (configurable via environment variables)
+    // Set SUPABASE_EMAIL, SUPABASE_PASSWORD, SUPABASE_HOME to override defaults
+    SupabaseCredentialIssuerCommands credIssuerCommands;
     Commands commands;
     registerCommandsDCL(commands);
     registerCommandsDelay(commands, &credIssuerCommands);

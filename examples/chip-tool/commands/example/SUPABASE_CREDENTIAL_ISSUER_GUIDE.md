@@ -147,21 +147,54 @@ CHIP_ERROR SupabaseCredentialIssuerCommands::InitializeSupabaseClient()
 
 ## Configuration
 
-**Default Values:**
-- Supabase URL: `https://vmhzoaoyvxfdlubxnudv.supabase.co`
-- Anon Key: Store in code or pass as parameter
-- Test Email: `test@example.com`
-- Test Password: `testme`
+### Default Values
+| Setting | Default Value |
+|---------|---------------|
+| Supabase URL | `https://vmhzoaoyvxfdlubxnudv.supabase.co` |
+| Anon Key | `sb_publishable_j8m2MH1NyROQk8jjNIB8AQ_5Ppvf5N7` |
+| Email | `test@lowpan.com` |
+| Password | `testme` |
+| Home | `Florida` |
+
+### Environment Variable Overrides
+
+All settings can be overridden via environment variables:
+
+| Environment Variable | Description | Example |
+|---------------------|-------------|---------|
+| `SUPABASE_URL` | Supabase project URL | `https://yourproject.supabase.co` |
+| `SUPABASE_ANON_KEY` | Supabase publishable/anon key | `sb_publishable_xxx` |
+| `SUPABASE_EMAIL` | Authentication email | `user@example.com` |
+| `SUPABASE_PASSWORD` | Authentication password | `mypassword` |
+| `SUPABASE_HOME` | Preferred home name | `Michigan` |
+
+### Home Selection
+
+The credential issuer supports **multi-home selection**:
+1. Lists all homes available to the authenticated user
+2. Looks for a home matching `SUPABASE_HOME` (default: "Florida")
+3. Falls back to the first available home if preferred home not found
 
 ## Usage in chip-tool
 
-Once implemented, chip-tool can use Supabase:
+chip-tool now uses Supabase by default. Configure via environment variables:
 
 ```bash
-# Commission with Supabase backend
-chip-tool pairing onnetwork-long 1 20202021 3841 \
-    --commissioner-name alpha \
-    --use-supabase
+# Use defaults (Florida home, test@lowpan.com)
+./chip-tool pairing onnetwork 1 20202021
+
+# Override home selection
+export SUPABASE_HOME="Michigan"
+./chip-tool pairing onnetwork 1 20202021
+
+# Use different credentials
+export SUPABASE_EMAIL="myuser@example.com"
+export SUPABASE_PASSWORD="mypassword"
+export SUPABASE_HOME="Beach House"
+./chip-tool pairing onnetwork 1 20202021
+
+# One-liner with environment variables
+SUPABASE_HOME="Vacation" SUPABASE_EMAIL="user@test.com" ./chip-tool pairing onnetwork 1 20202021
 ```
 
 ## Testing
@@ -169,21 +202,30 @@ chip-tool pairing onnetwork-long 1 20202021 3841 \
 1. Test authentication:
 ```cpp
 SupabaseClient client;
-client.Initialize("https://vmhzoaoyvxfdlubxnudv.supabase.co", "anon-key");
-auto result = client.Authenticate("test@example.com", "password");
+client.Initialize("https://vmhzoaoyvxfdlubxnudv.supabase.co",
+                  "sb_publishable_j8m2MH1NyROQk8jjNIB8AQ_5Ppvf5N7");
+auto result = client.Authenticate("test@lowpan.com", "testme");
 // Should return access_token
 ```
 
 2. Test certificate retrieval:
 ```cpp
+client.SetPreferredHomeName("Florida");  // Or any home name
 auto certs = client.GetCertificates(accessToken);
 // Should return Root CA and ICA certificates
 ```
 
-3. Test commissioning:
+3. Test commissioning with different homes:
 ```bash
-# Run chip-tool with Supabase backend
-./chip-tool ...
+# Use default home (Florida)
+./chip-tool pairing onnetwork 1 20202021
+
+# Use a different home
+SUPABASE_HOME="Michigan" ./chip-tool pairing onnetwork 1 20202021
+
+# Use different credentials and home
+SUPABASE_EMAIL="other@test.com" SUPABASE_PASSWORD="pass" SUPABASE_HOME="Beach" \
+  ./chip-tool pairing onnetwork 1 20202021
 ```
 
 ## Notes

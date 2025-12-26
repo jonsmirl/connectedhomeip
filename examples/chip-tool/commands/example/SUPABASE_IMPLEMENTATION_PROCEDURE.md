@@ -83,8 +83,9 @@ Located in: `~/aosp/esp-matter/connectedhomeip/connectedhomeip/examples/chip-too
 
 ### 2. Supabase Configuration
 - **Project URL**: `https://vmhzoaoyvxfdlubxnudv.supabase.co`
-- **Anon Key**: (get from Supabase dashboard → Project Settings → API → anon public)
-- **Test Account**: `test@example.com` / `testme`
+- **Anon Key**: `sb_publishable_j8m2MH1NyROQk8jjNIB8AQ_5Ppvf5N7` (new publishable key format)
+- **Test Account**: `test@lowpan.com` / `testme`
+- **Default Home**: `Florida`
 
 ### 3. Edge Functions (Already Deployed)
 - ✅ `list-homes` - Lists user's homes
@@ -985,48 +986,53 @@ ICA size: 478 bytes
 
 ## Integration with chip-tool
 
-### Option 1: Command-Line Flag
-
-Modify chip-tool main to accept `--use-supabase` flag:
-
-**File**: `examples/chip-tool/main.cpp` (approximate location)
+chip-tool now uses Supabase as the default credential issuer. The implementation is in `main.cpp`:
 
 ```cpp
-// Add option parsing
-if (useSupabase)
-{
-    credIssuerCommands = std::make_unique<SupabaseCredentialIssuerCommands>(
-        "https://vmhzoaoyvxfdlubxnudv.supabase.co",
-        "YOUR_ANON_KEY"
-    );
-}
-else
-{
-    credIssuerCommands = std::make_unique<ExampleCredentialIssuerCommands>();
-}
+// main.cpp - Uses Supabase credential issuer by default
+SupabaseCredentialIssuerCommands credIssuerCommands;
 ```
 
-### Option 2: Environment Variables
+### Environment Variable Configuration
+
+All settings can be overridden via environment variables at runtime:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SUPABASE_URL` | `https://vmhzoaoyvxfdlubxnudv.supabase.co` | Supabase project URL |
+| `SUPABASE_ANON_KEY` | `sb_publishable_j8m2MH1NyROQk8jjNIB8AQ_5Ppvf5N7` | Publishable API key |
+| `SUPABASE_EMAIL` | `test@lowpan.com` | Authentication email |
+| `SUPABASE_PASSWORD` | `testme` | Authentication password |
+| `SUPABASE_HOME` | `Florida` | Preferred home name |
+
+### Usage Examples
 
 ```bash
-export SUPABASE_URL="https://vmhzoaoyvxfdlubxnudv.supabase.co"
-export SUPABASE_ANON_KEY="your-anon-key"
-export USE_SUPABASE=1
+# Use all defaults
+./chip-tool pairing onnetwork 1 20202021
 
-./chip-tool pairing onnetwork-long 1 20202021 3841
+# Select a different home
+export SUPABASE_HOME="Michigan"
+./chip-tool pairing onnetwork 1 20202021
+
+# Use different account and home
+export SUPABASE_EMAIL="myuser@example.com"
+export SUPABASE_PASSWORD="mypassword"
+export SUPABASE_HOME="Beach House"
+./chip-tool pairing onnetwork 1 20202021
+
+# One-liner override
+SUPABASE_HOME="Vacation" ./chip-tool pairing onnetwork 1 20202021
 ```
 
-### Option 3: Configuration File
+### Home Selection Logic
 
-Create `chip-tool.conf`:
-```ini
-[supabase]
-enabled=true
-url=https://vmhzoaoyvxfdlubxnudv.supabase.co
-anon_key=your-anon-key
-test_email=test@example.com
-test_password=testme
-```
+When retrieving certificates, the credential issuer:
+1. Authenticates with Supabase using the configured email/password
+2. Calls `list-homes` Edge Function to get all available homes
+3. Searches for a home matching `SUPABASE_HOME` environment variable
+4. Falls back to the first available home if preferred home not found
+5. Calls `access-home` Edge Function with the selected home ID
 
 ---
 
@@ -1109,13 +1115,21 @@ Authorization: Bearer {access_token}
 ### Test Credentials
 
 **Default Test Account**:
-- Email: `test@example.com`
+- Email: `test@lowpan.com`
 - Password: `testme`
+- Default Home: `Florida`
+
+**Override via Environment Variables**:
+```bash
+export SUPABASE_EMAIL="other@example.com"
+export SUPABASE_PASSWORD="otherpassword"
+export SUPABASE_HOME="Other Home"
+```
 
 **Create Additional Test Accounts** (if needed):
 ```bash
 curl -X POST https://vmhzoaoyvxfdlubxnudv.supabase.co/auth/v1/signup \
-  -H "apikey: $ANON_KEY" \
+  -H "apikey: sb_publishable_j8m2MH1NyROQk8jjNIB8AQ_5Ppvf5N7" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "new-test@example.com",
@@ -1141,19 +1155,31 @@ curl -X POST https://vmhzoaoyvxfdlubxnudv.supabase.co/auth/v1/signup \
 - **Headers**: Added `apikey` header
 - **Requests**: Removed Firebase `data` wrapper
 - **Configuration**: Host/ports → Single URL + anon key
+- **Anon Key Format**: JWT → `sb_publishable_*` (new Supabase format)
+
+### New Features (v2.0)
+- **Environment Variable Configuration**: All settings overridable at runtime
+  - `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_EMAIL`, `SUPABASE_PASSWORD`, `SUPABASE_HOME`
+- **Multi-Home Selection**: Choose which home to use for certificates
+  - Set `SUPABASE_HOME` environment variable
+  - Automatic fallback to first available home
+- **Default Credential Issuer**: chip-tool now uses Supabase by default in `main.cpp`
 
 ### Next Steps
-1. Follow implementation steps 1-5
-2. Run compilation test
-3. Test authentication
-4. Test certificate retrieval
-5. Integrate with chip-tool
-6. Commission Matter devices
+1. Build chip-tool with the updated source files
+2. Set environment variables for your configuration
+3. Test authentication and certificate retrieval
+4. Commission Matter devices
 
 ---
 
-**Total Estimated Time**: 4-6 hours for implementation and testing
+**Status**: ✅ Implementation Complete
 
-**Difficulty**: Moderate (mostly copy/paste/rename with specific API changes)
+**Default Configuration**:
+- URL: `https://vmhzoaoyvxfdlubxnudv.supabase.co`
+- Anon Key: `sb_publishable_j8m2MH1NyROQk8jjNIB8AQ_5Ppvf5N7`
+- Email: `test@lowpan.com`
+- Password: `testme`
+- Home: `Florida`
 
 **Dependencies**: All Supabase Edge Functions already deployed and functional
