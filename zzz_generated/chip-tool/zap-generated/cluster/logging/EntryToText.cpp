@@ -21,14 +21,13 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
 
-// Include Lowpan custom clusters
-#include <clusters/LowpanLocation/ClusterId.h>
-#include <clusters/LowpanLocation/AttributeIds.h>
-#include <clusters/LowpanBleSensor/ClusterId.h>
-#include <clusters/LowpanBleSensor/AttributeIds.h>
-#include <clusters/LowpanBleSensor/CommandIds.h>
-#include <clusters/LowpanWebServer/ClusterId.h>
-#include <clusters/LowpanWebServer/AttributeIds.h>
+#include <clusters/LowpanLocation/Ids.h>
+#include <clusters/LowpanLocation/Attributes.h>
+#include <clusters/LowpanBleSensor/Ids.h>
+#include <clusters/LowpanBleSensor/Attributes.h>
+#include <clusters/LowpanBleSensor/Commands.h>
+#include <clusters/LowpanWebServer/Ids.h>
+#include <clusters/LowpanWebServer/Attributes.h>
 
 char const * ClusterIdToText(chip::ClusterId id)
 {
@@ -324,6 +323,10 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "LowpanBleSensor";
     case chip::app::Clusters::LowpanWebServer::Id:
         return "LowpanWebServer";
+    case chip::app::Clusters::LowpanHardwareMode::Id:
+        return "LowpanHardwareMode";
+    case chip::app::Clusters::LowpanProxyMode::Id:
+        return "LowpanProxyMode";
     default:
         return "Unknown";
     }
@@ -5108,6 +5111,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Longitude";
         case chip::app::Clusters::LowpanLocation::Attributes::Timezone::Id:
             return "Timezone";
+        case chip::app::Clusters::LowpanLocation::Attributes::Locality::Id:
+            return "Locality";
+        case chip::app::Clusters::LowpanLocation::Attributes::City::Id:
+            return "City";
         case chip::app::Clusters::LowpanLocation::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::LowpanLocation::Attributes::AcceptedCommandList::Id:
@@ -5155,6 +5162,52 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::LowpanWebServer::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::LowpanWebServer::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::LowpanHardwareMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::LowpanHardwareMode::Attributes::SupportedModes::Id:
+            return "SupportedModes";
+        case chip::app::Clusters::LowpanHardwareMode::Attributes::CurrentMode::Id:
+            return "CurrentMode";
+        case chip::app::Clusters::LowpanHardwareMode::Attributes::StartUpMode::Id:
+            return "StartUpMode";
+        case chip::app::Clusters::LowpanHardwareMode::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::LowpanHardwareMode::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::LowpanHardwareMode::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::LowpanHardwareMode::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::LowpanHardwareMode::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::LowpanProxyMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::LowpanProxyMode::Attributes::SupportedModes::Id:
+            return "SupportedModes";
+        case chip::app::Clusters::LowpanProxyMode::Attributes::CurrentMode::Id:
+            return "CurrentMode";
+        case chip::app::Clusters::LowpanProxyMode::Attributes::StartUpMode::Id:
+            return "StartUpMode";
+        case chip::app::Clusters::LowpanProxyMode::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::LowpanProxyMode::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::LowpanProxyMode::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::LowpanProxyMode::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::LowpanProxyMode::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -6612,6 +6665,24 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::LowpanHardwareMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::LowpanHardwareMode::Commands::ChangeToMode::Id:
+            return "ChangeToMode";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::LowpanProxyMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::LowpanProxyMode::Commands::ChangeToMode::Id:
+            return "ChangeToMode";
+        default:
+            return "Unknown";
+        }
+    }
     default:
         return "Unknown";
     }
@@ -7222,6 +7293,24 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "Unknown";
         }
     }
+    case chip::app::Clusters::LowpanHardwareMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::LowpanHardwareMode::Commands::ChangeToModeResponse::Id:
+            return "ChangeToModeResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::LowpanProxyMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::LowpanProxyMode::Commands::ChangeToModeResponse::Id:
+            return "ChangeToModeResponse";
+        default:
+            return "Unknown";
+        }
+    }
     default:
         return "Unknown";
     }
@@ -7425,6 +7514,10 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Lowpan Keypad";
     case 0xFFF28007:
         return "Lowpan Proxy";
+    case 0xFFF28008:
+        return "Lowpan Screen";
+    case 0xFFF28009:
+        return "Lowpan Thermostat";
     default:
         return "Unknown";
     }

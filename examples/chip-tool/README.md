@@ -600,3 +600,46 @@ To learn more about the tool, how to build it, use its commands and advanced
 features, read the following guide:
 
 -   [Working with the CHIP Tool](https://github.com/project-chip/connectedhomeip/tree/master/docs/development_controllers/chip-tool/chip_tool_guide.md)
+
+## Regenerating ZAP-Generated Code for chip-tool
+
+When cluster definitions change in `src/app/zap-templates/zcl/data-model/chip/`,
+the chip-tool ZAP-generated code needs to be regenerated. To regenerate only
+the chip-tool code (avoiding a full `zap_regen_all.py` which can cause merge
+conflicts):
+
+```bash
+./scripts/tools/zap/generate.py \
+  -t examples/chip-tool/templates/templates.json \
+  -o zzz_generated/chip-tool/zap-generated
+```
+
+This generates the following files:
+- `zzz_generated/chip-tool/zap-generated/cluster/Commands.h`
+- `zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.h`
+- `zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp`
+- `zzz_generated/chip-tool/zap-generated/cluster/logging/DataModelLogger.h`
+- `zzz_generated/chip-tool/zap-generated/cluster/logging/DataModelLogger.cpp`
+- `zzz_generated/chip-tool/zap-generated/cluster/logging/EntryToText.h`
+- `zzz_generated/chip-tool/zap-generated/cluster/logging/EntryToText.cpp`
+
+### Adding Custom Cluster Includes
+
+For custom clusters (like Lowpan clusters) that are not part of the standard
+ZAP templates, you must manually add their includes after regeneration.
+
+Add the following includes to `Commands.h`, `DataModelLogger.cpp`, and
+`EntryToText.cpp`:
+
+```cpp
+#include <clusters/LowpanLocation/Ids.h>
+#include <clusters/LowpanLocation/Attributes.h>
+#include <clusters/LowpanBleSensor/Ids.h>
+#include <clusters/LowpanBleSensor/Attributes.h>
+#include <clusters/LowpanBleSensor/Commands.h>
+#include <clusters/LowpanWebServer/Ids.h>
+#include <clusters/LowpanWebServer/Attributes.h>
+```
+
+These includes should be added after the standard includes but before any
+`using namespace` statements or function definitions.
