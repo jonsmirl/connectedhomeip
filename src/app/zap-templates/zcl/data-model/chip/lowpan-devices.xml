@@ -51,16 +51,16 @@
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="1" />
 
-    <attribute side="server" code="0x0000" define="LATITUDE" type="int32s" writable="false"
+    <attribute side="server" code="0x0000" define="LATITUDE" type="int32s" writable="true"
       default="0" optional="false">Latitude</attribute>
-    <attribute side="server" code="0x0001" define="LONGITUDE" type="int32s" writable="false"
+    <attribute side="server" code="0x0001" define="LONGITUDE" type="int32s" writable="true"
       default="0" optional="false">Longitude</attribute>
     <attribute side="server" code="0x0002" define="TIMEZONE" type="char_string" length="100"
-      writable="false" default="" optional="false">Timezone</attribute>
+      writable="true" default="" optional="false">Timezone</attribute>
     <attribute side="server" code="0x0003" define="LOCALITY" type="char_string" length="100"
-      writable="false" default="" optional="false">Locality</attribute>
+      writable="true" default="" optional="false">Locality</attribute>
     <attribute side="server" code="0x0004" define="CITY" type="char_string" length="100"
-      writable="false" default="" optional="false">City</attribute>
+      writable="true" default="" optional="false">City</attribute>
   </cluster>
 
   <enum name="ModeTag" type="enum16">
