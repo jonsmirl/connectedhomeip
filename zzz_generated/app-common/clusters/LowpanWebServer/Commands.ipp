@@ -28,9 +28,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace LowpanWebServer {
-namespace Commands {
-// No commands defined for this cluster
-} // namespace Commands
+namespace Commands {} // namespace Commands
 } // namespace LowpanWebServer
 } // namespace Clusters
 } // namespace app

@@ -22,13 +22,14 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
-import matter.controller.IntSubscriptionState
+import matter.controller.InvokeRequest
+import matter.controller.InvokeResponse
 import matter.controller.MatterController
 import matter.controller.ReadData
 import matter.controller.ReadRequest
-import matter.controller.StringSubscriptionState
 import matter.controller.SubscribeRequest
 import matter.controller.SubscriptionState
+import matter.controller.UByteSubscriptionState
 import matter.controller.UIntSubscriptionState
 import matter.controller.UShortSubscriptionState
 import matter.controller.WriteRequest
@@ -36,14 +37,39 @@ import matter.controller.WriteRequests
 import matter.controller.WriteResponse
 import matter.controller.cluster.structs.*
 import matter.controller.model.AttributePath
+import matter.controller.model.CommandPath
 import matter.tlv.AnonymousTag
+import matter.tlv.ContextSpecificTag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class LowpanLocationCluster(
+class LowpanProxyModeCluster(
   private val controller: MatterController,
   private val endpointId: UShort,
 ) {
+  class ChangeToModeResponse(val status: UByte, val statusText: String?)
+
+  class SupportedModesAttribute(val value: List<LowpanProxyModeClusterModeOptionStruct>)
+
+  sealed class SupportedModesAttributeSubscriptionState {
+    data class Success(val value: List<LowpanProxyModeClusterModeOptionStruct>) :
+      SupportedModesAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : SupportedModesAttributeSubscriptionState()
+
+    object SubscriptionEstablished : SupportedModesAttributeSubscriptionState()
+  }
+
+  class StartUpModeAttribute(val value: UByte?)
+
+  sealed class StartUpModeAttributeSubscriptionState {
+    data class Success(val value: UByte?) : StartUpModeAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : StartUpModeAttributeSubscriptionState()
+
+    object SubscriptionEstablished : StartUpModeAttributeSubscriptionState()
+  }
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -74,7 +100,71 @@ class LowpanLocationCluster(
     object SubscriptionEstablished : AttributeListAttributeSubscriptionState()
   }
 
-  suspend fun readLatitudeAttribute(): Int {
+  suspend fun changeToMode(
+    newMode: UByte,
+    timedInvokeTimeout: Duration? = null,
+  ): ChangeToModeResponse {
+    val commandId: UInt = 0u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_NEW_MODE_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_NEW_MODE_REQ), newMode)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_STATUS: Int = 0
+    var status_decoded: UByte? = null
+
+    val TAG_STATUS_TEXT: Int = 1
+    var statusText_decoded: String? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_STATUS_TEXT)) {
+        statusText_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return ChangeToModeResponse(status_decoded, statusText_decoded)
+  }
+
+  suspend fun readSupportedModesAttribute(): SupportedModesAttribute {
     val ATTRIBUTE_ID: UInt = 0u
 
     val attributePath =
@@ -96,59 +186,26 @@ class LowpanLocationCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Latitude attribute not found in response" }
+    requireNotNull(attributeData) { "Supportedmodes attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Int = tlvReader.getInt(AnonymousTag)
-
-    return decodedValue
-  }
-
-  suspend fun writeLatitudeAttribute(value: Int, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 0u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+    val decodedValue: List<LowpanProxyModeClusterModeOptionStruct> =
+      buildList<LowpanProxyModeClusterModeOptionStruct> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(LowpanProxyModeClusterModeOptionStruct.fromTlv(AnonymousTag, tlvReader))
         }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+        tlvReader.exitContainer()
       }
-    }
+
+    return SupportedModesAttribute(decodedValue)
   }
 
-  suspend fun subscribeLatitudeAttribute(
+  suspend fun subscribeSupportedModesAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<IntSubscriptionState> {
+  ): Flow<SupportedModesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
       listOf(
@@ -167,7 +224,7 @@ class LowpanLocationCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            IntSubscriptionState.Error(
+            SupportedModesAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -180,22 +237,31 @@ class LowpanLocationCluster(
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Latitude attribute not found in Node State update" }
+          requireNotNull(attributeData) {
+            "Supportedmodes attribute not found in Node State update"
+          }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Int = tlvReader.getInt(AnonymousTag)
+          val decodedValue: List<LowpanProxyModeClusterModeOptionStruct> =
+            buildList<LowpanProxyModeClusterModeOptionStruct> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(LowpanProxyModeClusterModeOptionStruct.fromTlv(AnonymousTag, tlvReader))
+              }
+              tlvReader.exitContainer()
+            }
 
-          emit(IntSubscriptionState.Success(decodedValue))
+          emit(SupportedModesAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(IntSubscriptionState.SubscriptionEstablished)
+          emit(SupportedModesAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
   }
 
-  suspend fun readLongitudeAttribute(): Int {
+  suspend fun readCurrentModeAttribute(): UByte {
     val ATTRIBUTE_ID: UInt = 1u
 
     val attributePath =
@@ -217,59 +283,19 @@ class LowpanLocationCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Longitude attribute not found in response" }
+    requireNotNull(attributeData) { "Currentmode attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Int = tlvReader.getInt(AnonymousTag)
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
     return decodedValue
   }
 
-  suspend fun writeLongitudeAttribute(value: Int, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 1u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
-  }
-
-  suspend fun subscribeLongitudeAttribute(
+  suspend fun subscribeCurrentModeAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<IntSubscriptionState> {
+  ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
       listOf(
@@ -288,7 +314,7 @@ class LowpanLocationCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            IntSubscriptionState.Error(
+            UByteSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -301,22 +327,22 @@ class LowpanLocationCluster(
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Longitude attribute not found in Node State update" }
+          requireNotNull(attributeData) { "Currentmode attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Int = tlvReader.getInt(AnonymousTag)
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
-          emit(IntSubscriptionState.Success(decodedValue))
+          emit(UByteSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(IntSubscriptionState.SubscriptionEstablished)
+          emit(UByteSubscriptionState.SubscriptionEstablished)
         }
       }
     }
   }
 
-  suspend fun readTimezoneAttribute(): String {
+  suspend fun readStartUpModeAttribute(): StartUpModeAttribute {
     val ATTRIBUTE_ID: UInt = 2u
 
     val attributePath =
@@ -338,16 +364,26 @@ class LowpanLocationCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Timezone attribute not found in response" }
+    requireNotNull(attributeData) { "Startupmode attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: String = tlvReader.getString(AnonymousTag)
+    val decodedValue: UByte? =
+      if (!tlvReader.isNull()) {
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUByte(AnonymousTag)
+        } else {
+          null
+        }
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
 
-    return decodedValue
+    return StartUpModeAttribute(decodedValue)
   }
 
-  suspend fun writeTimezoneAttribute(value: String, timedWriteTimeout: Duration? = null) {
+  suspend fun writeStartUpModeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 2u
 
     val tlvWriter = TlvWriter()
@@ -387,10 +423,10 @@ class LowpanLocationCluster(
     }
   }
 
-  suspend fun subscribeTimezoneAttribute(
+  suspend fun subscribeStartUpModeAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<StringSubscriptionState> {
+  ): Flow<StartUpModeAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
       listOf(
@@ -409,7 +445,7 @@ class LowpanLocationCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            StringSubscriptionState.Error(
+            StartUpModeAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -422,258 +458,26 @@ class LowpanLocationCluster(
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Timezone attribute not found in Node State update" }
+          requireNotNull(attributeData) { "Startupmode attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: String = tlvReader.getString(AnonymousTag)
+          val decodedValue: UByte? =
+            if (!tlvReader.isNull()) {
+              if (tlvReader.isNextTag(AnonymousTag)) {
+                tlvReader.getUByte(AnonymousTag)
+              } else {
+                null
+              }
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
 
-          emit(StringSubscriptionState.Success(decodedValue))
+          decodedValue?.let { emit(StartUpModeAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(StringSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readLocalityAttribute(): String {
-    val ATTRIBUTE_ID: UInt = 3u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Locality attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: String = tlvReader.getString(AnonymousTag)
-
-    return decodedValue
-  }
-
-  suspend fun writeLocalityAttribute(value: String, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 3u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
-  }
-
-  suspend fun subscribeLocalityAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<StringSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 3u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            StringSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Locality attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: String = tlvReader.getString(AnonymousTag)
-
-          emit(StringSubscriptionState.Success(decodedValue))
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(StringSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readCityAttribute(): String {
-    val ATTRIBUTE_ID: UInt = 4u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "City attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: String = tlvReader.getString(AnonymousTag)
-
-    return decodedValue
-  }
-
-  suspend fun writeCityAttribute(value: String, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 4u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
-  }
-
-  suspend fun subscribeCityAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<StringSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 4u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            StringSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "City attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: String = tlvReader.getString(AnonymousTag)
-
-          emit(StringSubscriptionState.Success(decodedValue))
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(StringSubscriptionState.SubscriptionEstablished)
+          emit(StartUpModeAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
@@ -1133,7 +937,7 @@ class LowpanLocationCluster(
   }
 
   companion object {
-    private val logger = Logger.getLogger(LowpanLocationCluster::class.java.name)
-    const val CLUSTER_ID: UInt = 4294114306u
+    private val logger = Logger.getLogger(LowpanProxyModeCluster::class.java.name)
+    const val CLUSTER_ID: UInt = 4294114310u
   }
 }

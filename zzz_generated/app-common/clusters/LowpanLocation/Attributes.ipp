@@ -38,6 +38,10 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, longitude);
     case Attributes::Timezone::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, timezone);
+    case Attributes::Locality::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, locality);
+    case Attributes::City::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, city);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

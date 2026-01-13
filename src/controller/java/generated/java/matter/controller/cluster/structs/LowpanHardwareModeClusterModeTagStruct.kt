@@ -16,54 +16,50 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class LowpanBleSensorClusterSensorStruct(
-  val macAddress: String,
-  val count: UInt,
-  val rssi: UShort,
-  val bridged: Boolean,
-) {
+class LowpanHardwareModeClusterModeTagStruct(val mfgCode: Optional<UShort>, val value: UShort) {
   override fun toString(): String = buildString {
-    append("LowpanBleSensorClusterSensorStruct {\n")
-    append("\tmacAddress : $macAddress\n")
-    append("\tcount : $count\n")
-    append("\trssi : $rssi\n")
-    append("\tbridged : $bridged\n")
+    append("LowpanHardwareModeClusterModeTagStruct {\n")
+    append("\tmfgCode : $mfgCode\n")
+    append("\tvalue : $value\n")
     append("}\n")
   }
 
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_MAC_ADDRESS), macAddress)
-      put(ContextSpecificTag(TAG_COUNT), count)
-      put(ContextSpecificTag(TAG_RSSI), rssi)
-      put(ContextSpecificTag(TAG_BRIDGED), bridged)
+      if (mfgCode.isPresent) {
+        val optmfgCode = mfgCode.get()
+        put(ContextSpecificTag(TAG_MFG_CODE), optmfgCode)
+      }
+      put(ContextSpecificTag(TAG_VALUE), value)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_MAC_ADDRESS = 1
-    private const val TAG_COUNT = 2
-    private const val TAG_RSSI = 3
-    private const val TAG_BRIDGED = 4
+    private const val TAG_MFG_CODE = 0
+    private const val TAG_VALUE = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): LowpanBleSensorClusterSensorStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): LowpanHardwareModeClusterModeTagStruct {
       tlvReader.enterStructure(tlvTag)
-      val macAddress = tlvReader.getString(ContextSpecificTag(TAG_MAC_ADDRESS))
-      val count = tlvReader.getUInt(ContextSpecificTag(TAG_COUNT))
-      val rssi = tlvReader.getUShort(ContextSpecificTag(TAG_RSSI))
-      val bridged = tlvReader.getBoolean(ContextSpecificTag(TAG_BRIDGED))
+      val mfgCode =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MFG_CODE))) {
+          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_MFG_CODE)))
+        } else {
+          Optional.empty()
+        }
+      val value = tlvReader.getUShort(ContextSpecificTag(TAG_VALUE))
 
       tlvReader.exitContainer()
 
-      return LowpanBleSensorClusterSensorStruct(macAddress, count, rssi, bridged)
+      return LowpanHardwareModeClusterModeTagStruct(mfgCode, value)
     }
   }
 }

@@ -15847,65 +15847,6 @@ class ChipClusters:
             },
         },
     }
-    _LOWPAN_GROUP_CLUSTER_INFO = {
-        "clusterName": "LowpanGroup",
-        "clusterId": 0xFFF2FC01,
-        "commands": {
-            0x00000000: {
-                "commandId": 0x00000000,
-                "commandName": "AddGroupEp",
-                "args": {
-                    "endpoint": "int",
-                    "groupName": "str",
-                },
-            },
-            0x00000001: {
-                "commandId": 0x00000001,
-                "commandName": "RemoveGroupEp",
-                "args": {
-                    "endpoint": "int",
-                },
-            },
-            0x00000002: {
-                "commandId": 0x00000002,
-                "commandName": "Configuration",
-                "args": {
-                },
-            },
-        },
-        "attributes": {
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
     _LOWPAN_LOCATION_CLUSTER_INFO = {
         "clusterName": "LowpanLocation",
         "clusterId": 0xFFF2FC02,
@@ -15917,18 +15858,35 @@ class ChipClusters:
                 "attributeId": 0x00000000,
                 "type": "int",
                 "reportable": True,
+                "writable": True,
             },
             0x00000001: {
                 "attributeName": "Longitude",
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
+                "writable": True,
             },
             0x00000002: {
                 "attributeName": "Timezone",
                 "attributeId": 0x00000002,
                 "type": "str",
                 "reportable": True,
+                "writable": True,
+            },
+            0x00000003: {
+                "attributeName": "Locality",
+                "attributeId": 0x00000003,
+                "type": "str",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000004: {
+                "attributeName": "City",
+                "attributeId": 0x00000004,
+                "type": "str",
+                "reportable": True,
+                "writable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
@@ -16027,16 +15985,138 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Enable",
+                "attributeName": "Jwt",
                 "attributeId": 0x00000000,
-                "type": "bool",
+                "type": "str",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _LOWPAN_HARDWARE_MODE_CLUSTER_INFO = {
+        "clusterName": "LowpanHardwareMode",
+        "clusterId": 0xFFF2FC05,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ChangeToMode",
+                "args": {
+                    "newMode": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SupportedModes",
+                "attributeId": 0x00000000,
+                "type": "",
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "Hostname",
+                "attributeName": "CurrentMode",
                 "attributeId": 0x00000001,
-                "type": "str",
+                "type": "int",
                 "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "StartUpMode",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _LOWPAN_PROXY_MODE_CLUSTER_INFO = {
+        "clusterName": "LowpanProxyMode",
+        "clusterId": 0xFFF2FC06,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ChangeToMode",
+                "args": {
+                    "newMode": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SupportedModes",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "CurrentMode",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "StartUpMode",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
@@ -16214,10 +16294,11 @@ class ChipClusters:
         0xFFF1FC05: _UNIT_TESTING_CLUSTER_INFO,
         0xFFF1FC06: _FAULT_INJECTION_CLUSTER_INFO,
         0xFFF1FC20: _SAMPLE_MEI_CLUSTER_INFO,
-        0xFFF2FC01: _LOWPAN_GROUP_CLUSTER_INFO,
         0xFFF2FC02: _LOWPAN_LOCATION_CLUSTER_INFO,
         0xFFF2FC03: _LOWPAN_BLE_SENSOR_CLUSTER_INFO,
         0xFFF2FC04: _LOWPAN_WEB_SERVER_CLUSTER_INFO,
+        0xFFF2FC05: _LOWPAN_HARDWARE_MODE_CLUSTER_INFO,
+        0xFFF2FC06: _LOWPAN_PROXY_MODE_CLUSTER_INFO,
     }
 
     _CLUSTER_NAME_DICT = {
@@ -16363,10 +16444,11 @@ class ChipClusters:
         "UnitTesting": _UNIT_TESTING_CLUSTER_INFO,
         "FaultInjection": _FAULT_INJECTION_CLUSTER_INFO,
         "SampleMei": _SAMPLE_MEI_CLUSTER_INFO,
-        "LowpanGroup": _LOWPAN_GROUP_CLUSTER_INFO,
         "LowpanLocation": _LOWPAN_LOCATION_CLUSTER_INFO,
         "LowpanBleSensor": _LOWPAN_BLE_SENSOR_CLUSTER_INFO,
         "LowpanWebServer": _LOWPAN_WEB_SERVER_CLUSTER_INFO,
+        "LowpanHardwareMode": _LOWPAN_HARDWARE_MODE_CLUSTER_INFO,
+        "LowpanProxyMode": _LOWPAN_PROXY_MODE_CLUSTER_INFO,
     }
 
     def __init__(self, chipstack):

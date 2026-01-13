@@ -29,6 +29,10 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::LowpanLocati
             return Longitude::kMetadataEntry;
         case Timezone::Id:
             return Timezone::kMetadataEntry;
+        case Locality::Id:
+            return Locality::kMetadataEntry;
+        case City::Id:
+            return City::kMetadataEntry;
         default:
             return std::nullopt;
         }

@@ -23,20 +23,26 @@ namespace Attributes {
 
 namespace Latitude {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Latitude::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace Latitude
 namespace Longitude {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Longitude::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace Longitude
 namespace Timezone {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Timezone::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace Timezone
-constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
-    Latitude::kMetadataEntry,
-    Longitude::kMetadataEntry,
-    Timezone::kMetadataEntry,
+namespace Locality {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(Locality::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
+} // namespace Locality
+namespace City {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(City::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
+} // namespace City
+constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
+    Latitude::kMetadataEntry, Longitude::kMetadataEntry, Timezone::kMetadataEntry, Locality::kMetadataEntry, City::kMetadataEntry,
 
 };
 
