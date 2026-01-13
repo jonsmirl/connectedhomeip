@@ -400,7 +400,7 @@ scripts/tools/zap/run_zaptool.sh <path-to-zap-file>
 | `src/app/` | Application layer, interaction model, clusters |
 | `src/app/clusters/` | Cluster implementations (~118 clusters) |
 | `src/controller/` | Matter controller implementations |
-| `src/credentials/` | Credential management, attestation |
+| `src/credentials/` | Credential management, attestation, PKI |
 | `src/crypto/` | Cryptographic operations |
 | `src/inet/` | IP networking layer |
 | `src/lib/` | Core libraries (TLV, support, DNS-SD) |
@@ -429,6 +429,41 @@ Update these files when adding clusters:
 - `src/app/zap_cluster_list.json` - Map cluster to directory
 - `src/app/common/templates/config-data.yaml` - Enable callbacks
 - `src/app/zap-templates/zcl/zcl.json` - Mark externally-handled attributes
+
+## Matter PKI (Certificate Hierarchy)
+
+Matter uses a three-level certificate hierarchy for device authentication:
+
+| Certificate | Purpose | Scope |
+|-------------|---------|-------|
+| **RCAC** (Root CA Certificate) | Defines the fabric | Shared by all devices in a home/fabric |
+| **ICAC** (Intermediate CA Certificate) | Identifies commissioning client | Unique per phone/app instance |
+| **NOC** (Node Operational Certificate) | Identifies the device | Unique per commissioned device |
+
+### Why Each Commissioning Client Needs Its Own ICAC
+
+**Interoperability**: Devices can communicate if they share the same RCAC, regardless of which ICAC signed their NOC. The RCAC defines fabric membership.
+
+**Revocation granularity**: Each commissioning client (phone/app) gets its own ICAC. This enables:
+- Targeted revocation when a phone is lost/stolen or a user is removed
+- Network continuity - devices commissioned by other clients remain operational
+- Their NOCs chain to different ICACs but the same trusted RCAC
+
+**Anti-pattern**: Do NOT share ICACs across commissioning clients. If ICACs were shared, revoking a compromised client would require re-commissioning every device on the fabric.
+
+### Certificate Chain
+
+```
+RCAC (Root)
+ └── ICAC-1 (Client A's phone)
+ │    └── NOC (Device 1)
+ │    └── NOC (Device 2)
+ └── ICAC-2 (Client B's phone)
+      └── NOC (Device 3)
+      └── NOC (Device 4)
+```
+
+All four devices can communicate because they trust the same RCAC. If Client A's phone is compromised, revoke ICAC-1 - Devices 3 and 4 continue working normally.
 
 ## Key Development Guides
 
