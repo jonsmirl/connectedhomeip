@@ -176,7 +176,7 @@
     <globalAttribute code="0xFFFD" side="either" value="1" />
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="JWT" type="char_string" length="256"
+    <attribute side="server" code="0x0000" define="JWT" type="char_string" length="254"
       writable="false" default="" optional="false">Jwt</attribute>
   </cluster>
 

@@ -30,7 +30,6 @@ source_set("keypad-manager") {
     ":keypad-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/app/clusters/lowpan-ble-sensor-server",
-    "${chip_root}/src/app/clusters/lowpan-group-server",
     "${chip_root}/src/app/clusters/mode-base-server",
   ]
   public_configs = [ ":config" ]
@@ -38,6 +37,7 @@ source_set("keypad-manager") {
     "include/KeypadDeviceInfoProvider.h",
     "include/KeypadManager.h",
     "include/KeypadModeSelect.h",
+    "src/CustomClusterCallbacks.cpp",
     "src/KeypadDeviceInfoProvider.cpp",
     "src/KeypadManager.cpp",
     "src/KeypadModeSelect.cpp",

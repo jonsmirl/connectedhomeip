@@ -29,12 +29,14 @@ source_set("rocker-manager") {
   deps = [
     ":rocker-common",
     "${chip_root}/src/lib",
+    "${chip_root}/src/app/clusters/lowpan-ble-sensor-server",
     "${chip_root}/src/app/clusters/mode-base-server",
   ]
   public_configs = [ ":config" ]
   sources = [
     "include/RockerManager.h",
     "include/RockerModeSelect.h",
+    "src/CustomClusterCallbacks.cpp",
     "src/RockerManager.cpp",
     "src/RockerModeSelect.cpp",
     "src/ZclCallbacks.cpp",
