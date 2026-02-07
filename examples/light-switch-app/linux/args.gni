@@ -24,9 +24,6 @@ chip_project_config_include_dirs =
     [ "${chip_root}/examples/light-switch-app/linux/include" ]
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
-# Use platform mDNS (Avahi) instead of minimal mDNS
-chip_mdns = "platform"
-
 # Enable ImGui UI by default for the light-switch-app
 chip_examples_enable_imgui_ui = true
 
