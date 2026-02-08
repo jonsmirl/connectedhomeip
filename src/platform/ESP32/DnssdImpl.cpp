@@ -129,7 +129,12 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inte
     return CHIP_NO_ERROR;
 }
 
-void ChipDnssdResolveNoLongerNeeded(const char * instanceName) {}
+void ChipDnssdResolveNoLongerNeeded(const char * instanceName)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+    EspDnssdResolveNoLongerNeeded(instanceName);
+#endif
+}
 
 CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)
 {

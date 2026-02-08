@@ -29,6 +29,10 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ESP32/ESP32Utils.h>
 
+extern "C" {
+#include "mdns_cache.h"
+}
+
 namespace {
 
 static constexpr uint32_t kTimeoutMilli = 3000;
@@ -492,6 +496,13 @@ exit:
     }
     else
     {
+        // Populate mDNS cache with resolved address
+        if (ctx->mAddressCount > 0 && ctx->mService)
+        {
+            mdns_cache_put(ctx->mInstanceName,
+                           reinterpret_cast<const uint8_t *>(ctx->mAddresses[0].Addr),
+                           ctx->mService->mPort);
+        }
         ctx->mResolveCb(ctx->mCbContext, ctx->mService, Span<Inet::IPAddress>(ctx->mAddresses, ctx->mAddressCount), error);
     }
     RemoveMdnsQuery(reinterpret_cast<GenericContext *>(ctx));
@@ -642,8 +653,96 @@ CHIP_ERROR EspDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip
     return error;
 }
 
+static void DeliverCachedResolve(intptr_t context)
+{
+    CachedResolveContext * cr = reinterpret_cast<CachedResolveContext *>(context);
+    if (!cr)
+    {
+        return;
+    }
+
+    DnssdService service = {};
+    Platform::CopyString(service.mName, cr->mInstanceName);
+    Platform::CopyString(service.mType, cr->mType);
+    service.mProtocol      = cr->mProtocol;
+    service.mPort          = cr->mPort;
+    service.mInterface     = cr->mInterfaceId;
+    service.mAddressType   = cr->mAddress.IsIPv4() ? Inet::IPAddressType::kIPv4 : Inet::IPAddressType::kIPv6;
+    service.mTransportType = service.mAddressType;
+    service.mTextEntries   = nullptr;
+    service.mTextEntrySize = 0;
+    service.mSubTypes      = nullptr;
+    service.mSubTypeSize   = 0;
+
+    ChipLogProgress(DeviceLayer, "mDNS cache hit for %s, delivering cached address", cr->mInstanceName);
+
+    cr->mCallback(cr->mCbContext, &service, Span<Inet::IPAddress>(&cr->mAddress, 1), CHIP_NO_ERROR);
+    chip::Platform::Delete(cr);
+}
+
+static void DeliverStaleFailure(intptr_t context)
+{
+    CachedResolveContext * cr = reinterpret_cast<CachedResolveContext *>(context);
+    if (!cr)
+    {
+        return;
+    }
+
+    ChipLogProgress(DeviceLayer, "mDNS cache stale for %s — device down, failing fast", cr->mInstanceName);
+
+    cr->mCallback(cr->mCbContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_TIMEOUT);
+    chip::Platform::Delete(cr);
+}
+
 CHIP_ERROR EspDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback, void * context)
 {
+    // Check mDNS cache first
+    uint8_t cached_addr[16];
+    uint16_t cached_port;
+    mdns_cache_result_t cacheResult = mdns_cache_get(service->mName, cached_addr, &cached_port);
+
+    if (cacheResult == MDNS_CACHE_HIT)
+    {
+        CachedResolveContext * cr = chip::Platform::New<CachedResolveContext>();
+        if (cr)
+        {
+            cr->mCallback = callback;
+            cr->mCbContext = context;
+            cr->mPort      = cached_port;
+            cr->mProtocol  = service->mProtocol;
+            cr->mInterfaceId = interface;
+            Platform::CopyString(cr->mInstanceName, service->mName);
+            Platform::CopyString(cr->mType, service->mType);
+
+            // Reconstruct IPAddress from cached 16 bytes
+            memcpy(cr->mAddress.Addr, cached_addr, 16);
+
+            // Deliver asynchronously — caller expects callback, not synchronous return
+            DeviceLayer::PlatformMgr().ScheduleWork(DeliverCachedResolve, reinterpret_cast<intptr_t>(cr));
+            return CHIP_NO_ERROR;
+        }
+        // Allocation failed — fall through to normal mDNS path
+    }
+    else if (cacheResult == MDNS_CACHE_STALE)
+    {
+        // Device is down (CASE already failed). Don't waste 45s on a doomed mDNS resolve.
+        // CHIP's resubscribe backoff will retry later. When the device reboots,
+        // its mDNS announcement will refresh the cache entry.
+        // Must deliver asynchronously — synchronous callback can deadlock the CHIP task
+        // if the failure triggers an immediate re-resolve.
+        CachedResolveContext * cr = chip::Platform::New<CachedResolveContext>();
+        if (cr)
+        {
+            cr->mCallback = callback;
+            cr->mCbContext = context;
+            Platform::CopyString(cr->mInstanceName, service->mName);
+            DeviceLayer::PlatformMgr().ScheduleWork(DeliverStaleFailure, reinterpret_cast<intptr_t>(cr));
+            return CHIP_NO_ERROR;
+        }
+        // Allocation failed — fall through to normal mDNS path
+    }
+
+    // MDNS_CACHE_MISS — first time seeing this device, do real mDNS resolve
     CHIP_ERROR error              = CHIP_NO_ERROR;
     mdns_search_once_t * querySrv = mdns_query_async_new(service->mName, service->mType, GetProtocolString(service->mProtocol),
                                                          MDNS_TYPE_SRV, kTimeoutMilli, kMaxResults, MdnsQueryNotifier);
@@ -669,6 +768,37 @@ CHIP_ERROR EspDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inter
         chip::Platform::Delete(ctx);
     }
     return error;
+}
+
+void EspDnssdResolveNoLongerNeeded(const char * instanceName)
+{
+    if (!instanceName)
+    {
+        return;
+    }
+    // Walk sQueryList and remove any ResolveContext matching instanceName.
+    // RemoveMdnsQuery modifies the list, so restart from head after each removal.
+    bool found = true;
+    while (found)
+    {
+        found               = false;
+        MdnsQuery * current = sQueryList;
+        while (current)
+        {
+            if (current->ctx && current->ctx->mContextType == ContextType::Resolve)
+            {
+                ResolveContext * resolveCtx = reinterpret_cast<ResolveContext *>(current->ctx);
+                if (strcmp(resolveCtx->mInstanceName, instanceName) == 0)
+                {
+                    ChipLogProgress(DeviceLayer, "Cancelling mDNS resolve for %s", instanceName);
+                    RemoveMdnsQuery(current->ctx);
+                    found = true;
+                    break;
+                }
+            }
+            current = current->next;
+        }
+    }
 }
 
 } // namespace Dnssd

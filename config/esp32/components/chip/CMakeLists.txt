@@ -31,7 +31,7 @@ endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/ota-image.cmake)
 
-set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash mdns)
+set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash mdns mdns_cache)
 
 if (NOT CMAKE_BUILD_EARLY_EXPANSION)
     if (CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
@@ -442,7 +442,7 @@ target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CHIP_ROOT}/config/esp32/${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}/../../"
 )
 
-set(matter_requires lwip freertos console bt)
+set(matter_requires lwip freertos console bt mdns_cache)
 idf_build_get_property(build_components BUILD_COMPONENTS)
 if("espressif__mdns" IN_LIST build_components)
     list(APPEND matter_requires espressif__mdns)

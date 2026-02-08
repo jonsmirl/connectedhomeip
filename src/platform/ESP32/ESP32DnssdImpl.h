@@ -139,6 +139,18 @@ struct ResolveContext : public GenericContext
     }
 };
 
+struct CachedResolveContext
+{
+    DnssdResolveCallback mCallback;
+    void * mCbContext;
+    Inet::IPAddress mAddress;
+    uint16_t mPort;
+    char mInstanceName[Common::kInstanceNameMaxLength + 1];
+    char mType[kDnssdTypeMaxSize + 1];
+    DnssdServiceProtocol mProtocol;
+    Inet::InterfaceId mInterfaceId;
+};
+
 CHIP_ERROR EspDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context);
 
 CHIP_ERROR EspDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context);
@@ -151,6 +163,8 @@ CHIP_ERROR EspDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip
 
 CHIP_ERROR EspDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
                            void * context);
+
+void EspDnssdResolveNoLongerNeeded(const char * instanceName);
 
 } // namespace Dnssd
 } // namespace chip
