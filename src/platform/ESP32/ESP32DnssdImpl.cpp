@@ -674,7 +674,7 @@ static void DeliverCachedResolve(intptr_t context)
     service.mSubTypes      = nullptr;
     service.mSubTypeSize   = 0;
 
-    ChipLogProgress(DeviceLayer, "mDNS cache hit for %s, delivering cached address", cr->mInstanceName);
+    ChipLogDetail(DeviceLayer, "mDNS cache hit: %s", cr->mInstanceName);
 
     cr->mCallback(cr->mCbContext, &service, Span<Inet::IPAddress>(&cr->mAddress, 1), CHIP_NO_ERROR);
     chip::Platform::Delete(cr);
@@ -688,7 +688,7 @@ static void DeliverStaleFailure(intptr_t context)
         return;
     }
 
-    ChipLogProgress(DeviceLayer, "mDNS cache stale for %s — device down, failing fast", cr->mInstanceName);
+    ChipLogDetail(DeviceLayer, "mDNS cache stale: %s", cr->mInstanceName);
 
     cr->mCallback(cr->mCbContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_TIMEOUT);
     chip::Platform::Delete(cr);
@@ -790,7 +790,7 @@ void EspDnssdResolveNoLongerNeeded(const char * instanceName)
                 ResolveContext * resolveCtx = reinterpret_cast<ResolveContext *>(current->ctx);
                 if (strcmp(resolveCtx->mInstanceName, instanceName) == 0)
                 {
-                    ChipLogProgress(DeviceLayer, "Cancelling mDNS resolve for %s", instanceName);
+                    ChipLogDetail(DeviceLayer, "Cancelling mDNS resolve for %s", instanceName);
                     RemoveMdnsQuery(current->ctx);
                     found = true;
                     break;
