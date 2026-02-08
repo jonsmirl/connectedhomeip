@@ -496,11 +496,20 @@ exit:
     }
     else
     {
-        // Populate mDNS cache with resolved address
+        // Populate mDNS cache with resolved address (prefer link-local — guaranteed reachable on LAN)
         if (ctx->mAddressCount > 0 && ctx->mService)
         {
+            size_t bestIdx = 0;
+            for (size_t i = 0; i < ctx->mAddressCount; i++)
+            {
+                if (ctx->mAddresses[i].IsIPv6LinkLocal())
+                {
+                    bestIdx = i;
+                    break;
+                }
+            }
             mdns_cache_put(ctx->mInstanceName,
-                           reinterpret_cast<const uint8_t *>(ctx->mAddresses[0].Addr),
+                           reinterpret_cast<const uint8_t *>(ctx->mAddresses[bestIdx].Addr),
                            ctx->mService->mPort);
         }
         ctx->mResolveCb(ctx->mCbContext, ctx->mService, Span<Inet::IPAddress>(ctx->mAddresses, ctx->mAddressCount), error);
@@ -666,7 +675,11 @@ static void DeliverCachedResolve(intptr_t context)
     Platform::CopyString(service.mType, cr->mType);
     service.mProtocol      = cr->mProtocol;
     service.mPort          = cr->mPort;
-    service.mInterface     = cr->mInterfaceId;
+    // Link-local addresses require interface ID for routing. Use WiFi STA netif
+    // as fallback (same as normal resolve path in ParseSrvResult).
+    service.mInterface     = cr->mInterfaceId != Inet::InterfaceId::Null()
+        ? cr->mInterfaceId
+        : GetServiceInterfaceId(nullptr);
     service.mAddressType   = cr->mAddress.IsIPv4() ? Inet::IPAddressType::kIPv4 : Inet::IPAddressType::kIPv6;
     service.mTransportType = service.mAddressType;
     service.mTextEntries   = nullptr;
