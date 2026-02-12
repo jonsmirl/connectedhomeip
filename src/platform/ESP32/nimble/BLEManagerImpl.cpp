@@ -71,6 +71,27 @@
 // Not declared in any header file, hence requires a forward declaration.
 extern "C" void ble_store_config_init(void);
 
+// Guard for nimble_port_init() — allows pre-initialization from app_main
+// (internal RAM stack) before the CHIP event loop task starts with a PSRAM stack.
+// RF calibration during nimble_port_init() disables cache, making PSRAM inaccessible.
+static bool s_nimble_port_initialized = false;
+
+extern "C" void chip_pre_init_nimble(void)
+{
+    if (!s_nimble_port_initialized)
+    {
+#if ESP_IDF_VERSION <= ESP_IDF_VERSION_VAL(5, 0, 1)
+        nimble_port_init();
+        s_nimble_port_initialized = true;
+#else
+        if (nimble_port_init() == 0)
+        {
+            s_nimble_port_initialized = true;
+        }
+#endif
+    }
+}
+
 #define MAX_ADV_DATA_LEN 31
 #define CHIP_ADV_DATA_TYPE_FLAGS 0x01
 #define CHIP_ADV_DATA_FLAGS 0x06
@@ -963,13 +984,18 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     }
 #endif
 
-// For ESP-IDF 5.0.1 and below, nimble_port_init() returns void
+    // nimble_port_init() may have been pre-called by chip_pre_init_nimble() on an
+    // internal RAM stack to allow this task to run on PSRAM safely.
+    if (!s_nimble_port_initialized)
+    {
 #if ESP_IDF_VERSION <= ESP_IDF_VERSION_VAL(5, 0, 1)
-    nimble_port_init();
+        nimble_port_init();
 #else
-    err = MapBLEError(nimble_port_init());
-    SuccessOrExit(err);
+        err = MapBLEError(nimble_port_init());
+        SuccessOrExit(err);
 #endif
+        s_nimble_port_initialized = true;
+    }
 
     /* Initialize the NimBLE host configuration. */
     ble_hs_cfg.reset_cb          = bleprph_on_reset;

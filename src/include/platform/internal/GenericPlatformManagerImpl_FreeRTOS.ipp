@@ -31,6 +31,11 @@
 
 #include <lib/support/CodeUtils.h>
 
+#if defined(CONFIG_SPIRAM) && defined(CONFIG_SPIRAM_ALLOW_STACK_EXTERNAL_MEMORY)
+#include <freertos/idf_additions.h>
+#include "esp_heap_caps.h"
+#endif
+
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
 // from which the GenericPlatformManagerImpl_FreeRTOS<> template inherits.
 #include <platform/internal/GenericPlatformManagerImpl.ipp>
@@ -44,10 +49,16 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    // Temporary: track internal RAM consumption during init
+    #include "esp_heap_caps.h"
+    #define _HEAP_DBG(label) printf("CHIP_INIT [%-28s] int_free=%d\n", label, \
+        (int)heap_caps_get_free_size(MALLOC_CAP_INTERNAL))
+
     vTaskSetTimeOutState(&mNextTimerBaseTime);
     mNextTimerDurationTicks = 0;
     mChipTimerActive        = false;
 
+    _HEAP_DBG("before mutex");
     if (mChipStackLock == NULL)
     {
 #if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE) && CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE
@@ -62,6 +73,10 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
             ExitNow(err = CHIP_ERROR_NO_MEMORY);
         }
     }
+    _HEAP_DBG("after mutex");
+
+    printf("CHIP_INIT sizeof(ChipDeviceEvent)=%d queue_depth=%d\n",
+           (int)sizeof(ChipDeviceEvent), (int)CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE);
 
     if (mChipEventQueue == NULL)
     {
@@ -83,6 +98,7 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
         // with a clean slate, as if we had just re-created the queue.
         xQueueReset(mChipEventQueue);
     }
+    _HEAP_DBG("after event queue");
 
     mShouldRunEventLoop.store(false);
 
@@ -107,6 +123,7 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
     }
 
     mShouldRunBackgroundEventLoop.store(false);
+    _HEAP_DBG("after BG queue");
 #endif
 
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
@@ -114,6 +131,7 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
     SuccessOrExit(err);
 
 exit:
+    #undef _HEAP_DBG
     return err;
 }
 
@@ -259,6 +277,14 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartEventLoopTask(v
 #if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_TASK) && CHIP_CONFIG_FREERTOS_USE_STATIC_TASK
     mEventLoopTask = xTaskCreateStatic(EventLoopTaskMain, CHIP_DEVICE_CONFIG_CHIP_TASK_NAME, MATTER_ARRAY_SIZE(mEventLoopStack),
                                        this, CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY, mEventLoopStack, &mEventLoopTaskStruct);
+#elif defined(CONFIG_SPIRAM) && defined(CONFIG_SPIRAM_ALLOW_STACK_EXTERNAL_MEMORY)
+    // Place CHIP event loop task stack in PSRAM to save internal RAM.
+    // Flash operations are safe: flash_stack_swap wraps esp_partition_* to use an internal
+    // stack, and ESP-IDF disables interrupts during cache-disable so PSRAM-stack tasks
+    // cannot be preempted while PSRAM is inaccessible.
+    xTaskCreateWithCaps(EventLoopTaskMain, CHIP_DEVICE_CONFIG_CHIP_TASK_NAME,
+                        CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE / sizeof(StackType_t),
+                        this, CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY, &mEventLoopTask, MALLOC_CAP_SPIRAM);
 #else
     xTaskCreate(EventLoopTaskMain, CHIP_DEVICE_CONFIG_CHIP_TASK_NAME, CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE / sizeof(StackType_t),
                 this, CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY, &mEventLoopTask);
@@ -341,6 +367,10 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartBackgroundEvent
     mBackgroundEventLoopTask = xTaskCreateStatic(
         BackgroundEventLoopTaskMain, CHIP_DEVICE_CONFIG_BG_TASK_NAME, MATTER_ARRAY_SIZE(mBackgroundEventLoopStack), this,
         CHIP_DEVICE_CONFIG_BG_TASK_PRIORITY, mBackgroundEventLoopStack, &mBackgroundEventLoopTaskStruct);
+#elif defined(CONFIG_SPIRAM) && defined(CONFIG_SPIRAM_ALLOW_STACK_EXTERNAL_MEMORY)
+    xTaskCreateWithCaps(BackgroundEventLoopTaskMain, CHIP_DEVICE_CONFIG_BG_TASK_NAME,
+                        CHIP_DEVICE_CONFIG_BG_TASK_STACK_SIZE / sizeof(StackType_t), this,
+                        CHIP_DEVICE_CONFIG_BG_TASK_PRIORITY, &mBackgroundEventLoopTask, MALLOC_CAP_SPIRAM);
 #else
     xTaskCreate(BackgroundEventLoopTaskMain, CHIP_DEVICE_CONFIG_BG_TASK_NAME,
                 CHIP_DEVICE_CONFIG_BG_TASK_STACK_SIZE / sizeof(StackType_t), this, CHIP_DEVICE_CONFIG_BG_TASK_PRIORITY,

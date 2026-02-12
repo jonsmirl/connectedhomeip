@@ -51,6 +51,11 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
 {
     CHIP_ERROR err;
 
+    // Temporary: track internal RAM consumption during init
+    #include "esp_heap_caps.h"
+    #define _HEAP_DBG(label) printf("CHIP_INIT [%-28s] int_free=%d\n", label, \
+        (int)heap_caps_get_free_size(MALLOC_CAP_INTERNAL))
+
     mMsgLayerWasActive = false;
 
     // Arrange for CHIP core errors to be translated to text
@@ -59,6 +64,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     // Arrange for Device Layer errors to be translated to text.
     RegisterDeviceLayerErrorFormatter();
 
+    _HEAP_DBG("before InitEntropy");
     err = InitEntropy();
     if (err != CHIP_NO_ERROR)
     {
@@ -67,6 +73,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     SuccessOrExit(err);
 
     // Initialize the CHIP system layer.
+    _HEAP_DBG("before SystemLayer.Init");
     err = SystemLayer().Init();
     if (err != CHIP_NO_ERROR)
     {
@@ -75,12 +82,14 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     SuccessOrExit(err);
 
     // Initialize the Configuration Manager.
+    _HEAP_DBG("before ConfigurationMgr.Init");
     err = ConfigurationMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Configuration Manager initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
     SuccessOrExit(err);
+    _HEAP_DBG("after ConfigurationMgr.Init");
 
     // Initialize the CHIP UDP layer.
     err = UDPEndPointManager()->Init(SystemLayer());
@@ -104,21 +113,25 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
 
     // Initialize the CHIP BLE manager.
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    _HEAP_DBG("before BLEMgr.Init");
     err = BLEMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "BLEManager initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
     SuccessOrExit(err);
+    _HEAP_DBG("after BLEMgr.Init");
 #endif
 
     // Initialize the Connectivity Manager object.
+    _HEAP_DBG("before ConnectivityMgr.Init");
     err = ConnectivityMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Connectivity Manager initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
     SuccessOrExit(err);
+    _HEAP_DBG("after ConnectivityMgr.Init");
 
     // Initialize the NFC onboarding payload manager
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD
@@ -145,6 +158,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     SuccessOrExit(err);
 
 exit:
+    #undef _HEAP_DBG
     return err;
 }
 
