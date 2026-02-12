@@ -28,9 +28,6 @@ chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 # Keypad app specific configuration
 chip_examples_enable_imgui_ui = true
 
-# Use platform mDNS (Avahi) instead of minimal mDNS
-chip_mdns = "platform"
-
 # Cluster configuration is handled by ZAP files
 # All cluster enables are managed through the ZAP file
 

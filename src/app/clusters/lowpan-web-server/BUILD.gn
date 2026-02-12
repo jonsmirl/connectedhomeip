@@ -21,6 +21,8 @@ source_set("lowpan-web-server") {
     "web-server.h",
   ]
   public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/util:types",
     "${chip_root}/src/lib/support",
   ]
 }

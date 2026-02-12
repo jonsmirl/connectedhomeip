@@ -3246,42 +3246,16 @@ cluster ColorControl = 768 {
   command StepColorTemperature(StepColorTemperatureRequest): DefaultSuccess = 76;
 }
 
-/** The Lowpan Group cluster provides facilities to manage group endpoints including
-      adding and removing group endpoints with associated names. */
-cluster LowpanGroup = 4294114305 {
-  revision 1;
-
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct AddGroupEpRequest {
-    int16u endpoint = 0;
-    char_string groupName = 1;
-  }
-
-  request struct RemoveGroupEpRequest {
-    int16u endpoint = 0;
-  }
-
-  /** Command to add a new group endpoint with the specified endpoint ID and group name. */
-  command AddGroupEp(AddGroupEpRequest): DefaultSuccess = 0;
-  /** Command to remove an existing group endpoint by its endpoint ID. */
-  command RemoveGroupEp(RemoveGroupEpRequest): DefaultSuccess = 1;
-  /** Configuration command for group management settings. */
-  command Configuration(): DefaultSuccess = 2;
-}
-
 /** The Location cluster provides facilities to configure and retrieve geographical
       location information including latitude, longitude, and timezone settings. */
 cluster LowpanLocation = 4294114306 {
   revision 1;
 
-  readonly attribute int32s latitude = 0;
-  readonly attribute int32s longitude = 1;
-  readonly attribute char_string<100> timezone = 2;
+  attribute int32s latitude = 0;
+  attribute int32s longitude = 1;
+  attribute char_string<100> timezone = 2;
+  attribute char_string<100> locality = 3;
+  attribute char_string<100> city = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3322,19 +3296,107 @@ cluster LowpanBleSensor = 4294114307 {
   command RemoveSensorEp(RemoveSensorEpRequest): DefaultSuccess = 1;
 }
 
-/** The Web Server cluster provides facilities to configure and control an embedded web
-      server including enable/disable functionality and hostname configuration with automatic mDNS
-      registration. */
+/** The Web Server cluster provides JWT-based authentication for secure HTTP API access.
+      The web server is always enabled and accessible via IP address. */
 cluster LowpanWebServer = 4294114308 {
   revision 1;
 
-  readonly attribute boolean enable = 0;
-  readonly attribute char_string<32> hostname = 1;
+  readonly attribute char_string<254> jwt = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Lowpan hardware load type selection for dimmer endpoints with physical lighting hardware. Controls dimming method based on connected load type. */
+cluster LowpanHardwareMode = 4294114309 {
+  revision 1;
+
+  enum ModeTag : enum16 {
+    kNoLoad = 32768;
+    kSwitch = 32769;
+    kMLV = 32770 [spec_name = "MLV"];
+    kELV = 32771 [spec_name = "ELV"];
+    kLED = 32772 [spec_name = "LED"];
+    kSmartBulb = 32773;
+  }
+
+  shared struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  shared struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    int8u newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    enum8 status = 0;
+    optional char_string<64> statusText = 1;
+  }
+
+  /** Change the hardware load type. On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+}
+
+/** Lowpan proxy mode selection for smartswitch endpoints. Controls how the switch proxies commands to bound devices. */
+cluster LowpanProxyMode = 4294114310 {
+  revision 1;
+
+  enum ModeTag : enum16 {
+    kNone = 32768;
+    kLight = 32769;
+    kGroup = 32770;
+    kSwitch = 32771;
+  }
+
+  shared struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  shared struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    int8u newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    enum8 status = 0;
+    optional char_string<64> statusText = 1;
+  }
+
+  /** Change the proxy mode. On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
 endpoint 0 {
@@ -3727,22 +3789,12 @@ endpoint 1 {
     handle command StepColorTemperature;
   }
 
-  server cluster LowpanGroup {
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-
-    handle command AddGroupEp;
-    handle command RemoveGroupEp;
-    handle command Configuration;
-  }
-
   server cluster LowpanLocation {
     ram      attribute latitude default = 0;
     ram      attribute longitude default = 0;
     ram      attribute timezone;
+    ram      attribute locality;
+    ram      attribute city;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -3763,13 +3815,38 @@ endpoint 1 {
   }
 
   server cluster LowpanWebServer {
-    ram      attribute enable default = false;
-    ram      attribute hostname;
+    ram      attribute jwt default = "false";
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster LowpanHardwareMode {
+    callback attribute supportedModes;
+    ram      attribute currentMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command ChangeToMode;
+    handle command ChangeToModeResponse;
+  }
+
+  server cluster LowpanProxyMode {
+    callback attribute supportedModes;
+    ram      attribute currentMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command ChangeToMode;
+    handle command ChangeToModeResponse;
   }
 }
 endpoint 2 {

@@ -154,7 +154,8 @@ Generally regenerate using one of:
 | 4294048773 | 0xFFF1FC05 | UnitTesting                                             |
 | 4294048774 | 0xFFF1FC06 | FaultInjection                                          |
 | 4294048800 | 0xFFF1FC20 | SampleMei                                               |
-| 4294114305 | 0xFFF2FC01 | LowpanGroup                                             |
 | 4294114306 | 0xFFF2FC02 | LowpanLocation                                          |
 | 4294114307 | 0xFFF2FC03 | LowpanBleSensor                                         |
 | 4294114308 | 0xFFF2FC04 | LowpanWebServer                                         |
+| 4294114309 | 0xFFF2FC05 | LowpanHardwareMode                                      |
+| 4294114310 | 0xFFF2FC06 | LowpanProxyMode                                         |

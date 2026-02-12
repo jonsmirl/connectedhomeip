@@ -18,7 +18,7 @@
 
 /**
  * @file CustomClusterCallbacks.cpp
- * @brief Stub implementations for Lowpan custom cluster callbacks in the keypad-app.
+ * @brief Stub implementations for Lowpan custom cluster callbacks in the rocker-app.
  */
 
 #include <app/CommandHandler.h>
