@@ -176,7 +176,12 @@ void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t even
     {
         ChipLogProgress(DeviceLayer, "Posting ESPSystemEvent with eventId : %ld", eventId);
     }
-    sInstance.PostEventOrDie(&event);
+    CHIP_ERROR err2 = sInstance.PostEvent(&event);
+    if (err2 != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to post event %d: %" CHIP_ERROR_FORMAT ". Dropping event (queue full).",
+                     static_cast<int>(event.Type), err2.Format());
+    }
 }
 
 } // namespace DeviceLayer

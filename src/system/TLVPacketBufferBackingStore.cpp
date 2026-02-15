@@ -55,6 +55,11 @@ CHIP_ERROR TLVPacketBufferBackingStore::GetNextBuffer(chip::TLV::TLVReader & rea
     else
     {
         bufStart = mCurrentBuffer->Start();
+
+        // Detect heap corruption: small values (0x2, 0x5) appear where valid
+        // RAM pointers should be.  Catch early instead of crashing in TLVReader.
+        VerifyOrReturnError(reinterpret_cast<uintptr_t>(bufStart) >= 0x10000, CHIP_ERROR_INCORRECT_STATE);
+
         VerifyOrReturnError(CanCastTo<uint32_t>(mCurrentBuffer->DataLength()), CHIP_ERROR_INVALID_ARGUMENT);
         bufLen = static_cast<uint32_t>(mCurrentBuffer->DataLength());
     }

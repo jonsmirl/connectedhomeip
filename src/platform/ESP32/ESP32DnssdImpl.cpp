@@ -508,9 +508,34 @@ exit:
                     break;
                 }
             }
+            // Convert resolve TXT to cache format (fallback for cache MISS path)
+            mdns_cache_txt_t resolveTxt[MDNS_CACHE_MAX_TXT];
+            size_t resolveTxtCount = 0;
+            if (ctx->mTxtQueryResult && ctx->mTxtQueryResult->txt)
+            {
+                for (size_t t = 0; t < ctx->mTxtQueryResult->txt_count && resolveTxtCount < MDNS_CACHE_MAX_TXT; t++)
+                {
+                    if (!ctx->mTxtQueryResult->txt[t].key) continue;
+                    size_t klen = strlen(ctx->mTxtQueryResult->txt[t].key);
+                    if (klen == 0 || klen >= MDNS_CACHE_TXT_KEY_MAX) continue;
+                    uint8_t vlen = ctx->mTxtQueryResult->txt_value_len ? ctx->mTxtQueryResult->txt_value_len[t] : 0;
+                    if (vlen >= MDNS_CACHE_TXT_VAL_MAX) vlen = MDNS_CACHE_TXT_VAL_MAX - 1;
+                    memset(&resolveTxt[resolveTxtCount], 0, sizeof(mdns_cache_txt_t));
+                    memcpy(resolveTxt[resolveTxtCount].key, ctx->mTxtQueryResult->txt[t].key, klen);
+                    resolveTxt[resolveTxtCount].key_len = (uint8_t)klen;
+                    if (vlen > 0 && ctx->mTxtQueryResult->txt[t].value)
+                    {
+                        memcpy(resolveTxt[resolveTxtCount].value, ctx->mTxtQueryResult->txt[t].value, vlen);
+                    }
+                    resolveTxt[resolveTxtCount].value_len = vlen;
+                    resolveTxtCount++;
+                }
+            }
             mdns_cache_put(ctx->mInstanceName,
                            reinterpret_cast<const uint8_t *>(ctx->mAddresses[bestIdx].Addr),
-                           ctx->mService->mPort);
+                           ctx->mService->mPort,
+                           resolveTxtCount > 0 ? resolveTxt : NULL,
+                           resolveTxtCount);
         }
         ctx->mResolveCb(ctx->mCbContext, ctx->mService, Span<Inet::IPAddress>(ctx->mAddresses, ctx->mAddressCount), error);
     }
@@ -543,8 +568,10 @@ static void MdnsQueryDone(intptr_t context)
     GenericContext * ctx             = FindMdnsQuery(queryHandle);
     if (!ctx)
     {
+        // Context was already removed from sQueryList (e.g., by
+        // EspDnssdResolveNoLongerNeeded).  Its destructor already called
+        // mdns_query_async_delete(), so do NOT delete the handle again.
         mdns_query_results_free(result);
-        mdns_query_async_delete(queryHandle);
         return;
     }
     if (ctx->mContextType == ContextType::Browse)
@@ -670,6 +697,15 @@ static void DeliverCachedResolve(intptr_t context)
         return;
     }
 
+    // Build TextEntry array on stack from cached TXT — valid during synchronous callback
+    TextEntry textEntries[MDNS_CACHE_MAX_TXT];
+    for (size_t i = 0; i < cr->mTxtCount && i < MDNS_CACHE_MAX_TXT; i++)
+    {
+        textEntries[i].mKey      = cr->mTxt[i].key;
+        textEntries[i].mData     = cr->mTxt[i].value;
+        textEntries[i].mDataSize = cr->mTxt[i].value_len;
+    }
+
     DnssdService service = {};
     Platform::CopyString(service.mName, cr->mInstanceName);
     Platform::CopyString(service.mType, cr->mType);
@@ -682,12 +718,12 @@ static void DeliverCachedResolve(intptr_t context)
         : GetServiceInterfaceId(nullptr);
     service.mAddressType   = cr->mAddress.IsIPv4() ? Inet::IPAddressType::kIPv4 : Inet::IPAddressType::kIPv6;
     service.mTransportType = service.mAddressType;
-    service.mTextEntries   = nullptr;
-    service.mTextEntrySize = 0;
+    service.mTextEntries   = (cr->mTxtCount > 0) ? textEntries : nullptr;
+    service.mTextEntrySize = cr->mTxtCount;
     service.mSubTypes      = nullptr;
     service.mSubTypeSize   = 0;
 
-    ChipLogDetail(DeviceLayer, "mDNS cache hit: %s", cr->mInstanceName);
+    ChipLogDetail(DeviceLayer, "mDNS cache hit: %s (txt=%zu)", cr->mInstanceName, cr->mTxtCount);
 
     cr->mCallback(cr->mCbContext, &service, Span<Inet::IPAddress>(&cr->mAddress, 1), CHIP_NO_ERROR);
     chip::Platform::Delete(cr);
@@ -709,10 +745,14 @@ static void DeliverStaleFailure(intptr_t context)
 
 CHIP_ERROR EspDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback, void * context)
 {
-    // Check mDNS cache first
+    // Check mDNS cache first — browse results populate addr + TXT,
+    // so we can answer resolves without any mDNS queries.
     uint8_t cached_addr[16];
     uint16_t cached_port;
-    mdns_cache_result_t cacheResult = mdns_cache_get(service->mName, cached_addr, &cached_port);
+    mdns_cache_txt_t cached_txt[MDNS_CACHE_MAX_TXT];
+    size_t cached_txt_count = 0;
+    mdns_cache_result_t cacheResult = mdns_cache_get(service->mName, cached_addr, &cached_port,
+                                                      cached_txt, &cached_txt_count, MDNS_CACHE_MAX_TXT);
 
     if (cacheResult == MDNS_CACHE_HIT)
     {
@@ -724,6 +764,11 @@ CHIP_ERROR EspDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inter
             cr->mPort      = cached_port;
             cr->mProtocol  = service->mProtocol;
             cr->mInterfaceId = interface;
+            cr->mTxtCount  = cached_txt_count;
+            if (cached_txt_count > 0)
+            {
+                memcpy(cr->mTxt, cached_txt, cached_txt_count * sizeof(mdns_cache_txt_t));
+            }
             Platform::CopyString(cr->mInstanceName, service->mName);
             Platform::CopyString(cr->mType, service->mType);
 

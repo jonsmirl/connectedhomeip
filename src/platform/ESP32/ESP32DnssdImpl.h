@@ -19,6 +19,7 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <mdns.h>
+#include "mdns_cache.h"
 
 namespace chip {
 namespace Dnssd {
@@ -149,6 +150,8 @@ struct CachedResolveContext
     char mType[kDnssdTypeMaxSize + 1];
     DnssdServiceProtocol mProtocol;
     Inet::InterfaceId mInterfaceId;
+    mdns_cache_txt_t mTxt[MDNS_CACHE_MAX_TXT];
+    size_t mTxtCount;
 };
 
 CHIP_ERROR EspDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context);
