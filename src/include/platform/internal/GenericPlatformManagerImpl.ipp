@@ -52,9 +52,13 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     CHIP_ERROR err;
 
     // Temporary: track internal RAM consumption during init
+    #ifdef CONFIG_IDF_TARGET
     #include "esp_heap_caps.h"
     #define _HEAP_DBG(label) printf("CHIP_INIT [%-28s] int_free=%d\n", label, \
         (int)heap_caps_get_free_size(MALLOC_CAP_INTERNAL))
+    #else
+    #define _HEAP_DBG(label) do {} while(0)
+    #endif
 
     mMsgLayerWasActive = false;
 
