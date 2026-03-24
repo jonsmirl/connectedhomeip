@@ -201,8 +201,8 @@ bool SupabaseClient::TestConnectivity()
 
     ChipLogProgress(AppServer, "Testing Supabase connectivity...");
 
-    // Test connectivity to Supabase REST API
-    std::string testUrl = mSupabaseUrl + "/rest/v1/";
+    // Test connectivity to Supabase REST API (query a table, not the root endpoint)
+    std::string testUrl = mSupabaseUrl + "/rest/v1/homes?select=id&limit=0";
 
     ChipLogProgress(AppServer, "Testing Supabase endpoint: %s", testUrl.c_str());
     std::string headers  = "apikey: " + mAnonKey;
